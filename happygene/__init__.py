@@ -13,6 +13,12 @@ from happygene.expression import (
 )
 from happygene.model import GeneNetwork
 from happygene.mutation import MutationModel, PointMutation
+from happygene.regulatory_expression import (
+    AdditiveRegulation,
+    CompositeExpressionModel,
+    MultiplicativeRegulation,
+    RegulatoryExpressionModel,
+)
 from happygene.regulatory_network import RegulationConnection, RegulatoryNetwork
 from happygene.selection import (
     ProportionalSelection,
@@ -30,6 +36,10 @@ __all__ = [
     "LinearExpression",
     "HillExpression",
     "ConstantExpression",
+    "RegulatoryExpressionModel",
+    "AdditiveRegulation",
+    "MultiplicativeRegulation",
+    "CompositeExpressionModel",
     "SelectionModel",
     "ProportionalSelection",
     "ThresholdSelection",
