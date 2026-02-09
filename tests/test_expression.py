@@ -1,7 +1,14 @@
 """Tests for expression models and conditions."""
+
 import pytest
+
 from happygene.conditions import Conditions
-from happygene.expression import ExpressionModel, LinearExpression, ConstantExpression, HillExpression
+from happygene.expression import (
+    ConstantExpression,
+    ExpressionModel,
+    HillExpression,
+    LinearExpression,
+)
 
 
 class TestConditions:
@@ -39,6 +46,7 @@ class TestExpressionModel:
 
     def test_expression_model_subclass_must_implement_compute(self):
         """Subclass must implement compute() method."""
+
         class BrokenExpression(ExpressionModel):
             pass
 

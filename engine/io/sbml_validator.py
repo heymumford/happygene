@@ -1,4 +1,3 @@
-
 # Copyright (C) 2026 Eric C. Mumford <ericmumford@outlook.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,10 +25,9 @@ Validates SBML documents for:
 Production implementation with comprehensive validation.
 """
 
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Union
-import xml.etree.ElementTree as ET
-
 
 SBML_NAMESPACE = "http://www.sbml.org/sbml/level3/version2"
 
@@ -146,7 +144,9 @@ def _validate_model_contents(model: ET.Element, namespaces: dict[str, str]) -> N
         raise ValueError("Model must contain at least one reaction")
 
 
-def _validate_numerical_consistency(model: ET.Element, namespaces: dict[str, str]) -> None:
+def _validate_numerical_consistency(
+    model: ET.Element, namespaces: dict[str, str]
+) -> None:
     """Validate numerical values in SBML."""
     # Check species concentrations are non-negative
     species_list = model.find(".//sbml:listOfSpecies", namespaces)

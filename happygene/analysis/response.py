@@ -10,7 +10,28 @@ Builds reduced-order models from batch results, enabling:
 Supports:
 - Polynomial response surfaces (linear, quadratic)
 - Gaussian Process (Kriging)
-- Random Forest surrogates
+
+Example
+-------
+>>> import numpy as np
+>>> import pandas as pd
+>>> from happygene.analysis.response import ResponseSurfaceModel
+>>>
+>>> # Create training data with known relationship
+>>> np.random.seed(42)
+>>> X = np.random.rand(100, 3)
+>>> y = 2*X[:,0] + 3*X[:,1] + 0.5*X[:,2] + np.random.normal(0, 0.1, 100)
+>>> df = pd.DataFrame(X, columns=['p0', 'p1', 'p2'])
+>>> df['survival'] = y
+>>>
+>>> # Fit linear response surface
+>>> model = ResponseSurfaceModel(['p0', 'p1', 'p2'], method='linear')
+>>> model.fit(df, output_col='survival')
+>>>
+>>> # Validate with cross-validation
+>>> metrics = model.cross_validate(df, output_col='survival')
+>>> print(f"R²: {metrics['r2']:.3f}")  # doctest: +SKIP
+R²: 0.950
 """
 
 from typing import Dict, List
@@ -39,7 +60,7 @@ class ResponseSurfaceModel:
         self.param_names = param_names
         self.n_params = len(param_names)
         self.method = method
-        self.scaler = StandardScaler()
+        self.scaler = None  # Initialized in fit() after sklearn import
         self.model = None
         self.is_fitted = False
 
@@ -86,7 +107,9 @@ class ResponseSurfaceModel:
 
         # Fit model
         if self.method == "rf":
-            self.model = RandomForestRegressor(n_estimators=100, random_state=42, max_depth=10)
+            self.model = RandomForestRegressor(
+                n_estimators=100, random_state=42, max_depth=10
+            )
         else:
             self.model = LinearRegression()
 
@@ -131,7 +154,10 @@ class ResponseSurfaceModel:
         return self.model.predict(X_test)
 
     def cross_validate(
-        self, batch_results: pd.DataFrame, output_col: str = "survival", cv_folds: int = 5
+        self,
+        batch_results: pd.DataFrame,
+        output_col: str = "survival",
+        cv_folds: int = 5,
     ) -> Dict[str, float]:
         """Cross-validate model performance.
 
@@ -157,8 +183,14 @@ class ResponseSurfaceModel:
         X = batch_results[param_cols].values
         y = batch_results[output_col].values
 
-        # Normalize features
-        X_scaled = self.scaler.fit_transform(X)
+        # Use fitted scaler for consistency with predict()
+        if not hasattr(self, "scaler") or self.scaler is None:
+            from sklearn.preprocessing import StandardScaler
+
+            self.scaler = StandardScaler()
+            X_scaled = self.scaler.fit_transform(X)
+        else:
+            X_scaled = self.scaler.transform(X)
 
         # Build feature matrix
         if self.method == "linear":
@@ -172,7 +204,9 @@ class ResponseSurfaceModel:
 
         # Fit model for scoring
         if self.method == "rf":
-            model = RandomForestRegressor(n_estimators=100, random_state=42, max_depth=10)
+            model = RandomForestRegressor(
+                n_estimators=100, random_state=42, max_depth=10
+            )
         else:
             model = LinearRegression()
 

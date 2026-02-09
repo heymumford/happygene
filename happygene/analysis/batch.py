@@ -16,6 +16,7 @@ import pandas as pd
 try:
     from SALib.sample import morris, saltelli
     from SALib.sample.sobol import sample as sobol_sample
+
     SALIB_AVAILABLE = True
 except ImportError:
     SALIB_AVAILABLE = False
@@ -77,9 +78,7 @@ class BatchSimulator:
 
         self.seed_manager = SeedManager(seed)
 
-    def generate_samples(
-        self, n_samples: int, sampler: str = "sobol"
-    ) -> np.ndarray:
+    def generate_samples(self, n_samples: int, sampler: str = "sobol") -> np.ndarray:
         """Generate parameter samples in normalized [0, 1] space.
 
         Parameters
@@ -177,7 +176,9 @@ class BatchSimulator:
         ParameterValidator.validate_samples(samples, len(self.param_names))
 
         # Denormalize samples to actual parameter ranges
-        denorm_samples = denormalize_samples(samples, self.param_space, self.param_names)
+        denorm_samples = denormalize_samples(
+            samples, self.param_space, self.param_names
+        )
 
         # Run batch simulations
         results_list = []
@@ -193,9 +194,7 @@ class BatchSimulator:
             model = self.model_factory(params_dict)
 
             # Run simulation
-            outputs = self._run_single_simulation(
-                model, n_generations, run_seed
-            )
+            outputs = self._run_single_simulation(model, n_generations, run_seed)
 
             # Collect results
             result = {
@@ -242,15 +241,17 @@ class BatchSimulator:
             Output metrics: {'total_repairs', 'repair_time', 'survival', ...}
         """
         # Handle mock configs used in testing
-        if hasattr(model, '_is_mock') and model._is_mock:
+        if hasattr(model, "_is_mock") and model._is_mock:
             # For mock models, generate realistic outputs based on parameters
             rng = np.random.default_rng(seed)
-            kinetics = model.kinetics if hasattr(model, 'kinetics') else None
-            dose_gy = model.dose_gy if hasattr(model, 'dose_gy') else 3.0
+            kinetics = model.kinetics if hasattr(model, "kinetics") else None
+            dose_gy = model.dose_gy if hasattr(model, "dose_gy") else 3.0
 
             # Generate outputs that depend on parameters
             # Higher recognition rate → more repairs
-            recognition_rate = getattr(kinetics, 'recognition_rate', 0.1) if kinetics else 0.1
+            recognition_rate = (
+                getattr(kinetics, "recognition_rate", 0.1) if kinetics else 0.1
+            )
             total_repairs = int(100 + 300 * recognition_rate + rng.normal(0, 20))
             total_repairs = max(0, total_repairs)
 
@@ -285,7 +286,9 @@ class BatchSimulator:
         outputs = {
             "total_repairs": float(stats.get("mean_repair_count", 0.0)),
             "repair_time": float(stats.get("mean_repair_time", 0.0)),
-            "survival": float(stats.get("mean_survival", 0.5)),  # Default to 0.5 if not present
+            "survival": float(
+                stats.get("mean_survival", 0.5)
+            ),  # Default to 0.5 if not present
         }
 
         return outputs

@@ -42,4 +42,7 @@ __all__ = [
     "SobolIndices",
     "MorrisAnalyzer",
     "MorrisIndices",
+    "CorrelationAnalyzer",
+    "ResponseSurfaceModel",
+    "OutputExporter",
 ]

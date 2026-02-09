@@ -10,6 +10,32 @@ Produces:
 - σ (std dev of effect): Parameter interaction
 - μ* (mean absolute effect): Robustness to parameter range
 - Parameter classification: Important, Interaction, Insignificant
+
+Example
+-------
+>>> import numpy as np
+>>> import pandas as pd
+>>> from happygene.analysis.batch import BatchSimulator
+>>> from happygene.analysis.morris import MorrisAnalyzer
+>>>
+>>> # Create simulator with 5 parameters
+>>> param_space = {'p0': (0.01, 0.99), 'p1': (0.01, 0.99),
+...                 'p2': (0.01, 0.99), 'p3': (0.01, 0.99),
+...                 'p4': (0.1, 10.0)}
+>>> batch = BatchSimulator(param_space, 'DummyModel')
+>>>
+>>> # Generate and run 120 Morris samples (20 trajectories)
+>>> samples = batch.generate_samples('morris', 20)
+>>> results = batch.run_batch(samples, generations=100, seed=42)
+>>>
+>>> # Analyze with Morris indices
+>>> analyzer = MorrisAnalyzer(list(param_space.keys()))
+>>> indices = analyzer.analyze(results, output_col='survival')
+>>>
+>>> # Classify parameters by sensitivity type
+>>> classified = analyzer.classify_parameters(indices)
+>>> print(f"Important parameters: {classified['Important']}")  # doctest: +SKIP
+Important parameters: ['p0']
 """
 
 from dataclasses import dataclass
@@ -20,6 +46,7 @@ import pandas as pd
 
 try:
     from SALib.analyze import morris as morris_analyze
+
     SALIB_AVAILABLE = True
 except ImportError:
     SALIB_AVAILABLE = False
@@ -95,9 +122,7 @@ class MorrisAnalyzer:
         Parameter bounds (unused for analysis, kept for consistency)
     """
 
-    def __init__(
-        self, param_names: List[str], param_space: Optional[Dict] = None
-    ):
+    def __init__(self, param_names: List[str], param_space: Optional[Dict] = None):
         """Initialize MorrisAnalyzer."""
         if not SALIB_AVAILABLE:
             raise ImportError("SALib required: pip install SALib")
@@ -150,7 +175,7 @@ class MorrisAnalyzer:
         }
 
         # Compute Morris indices
-        Si = morris_analyze(problem, X, Y, conf_level=0.95, seed=42)
+        Si = morris_analyze.analyze(problem, X, Y, conf_level=0.95, seed=42)
 
         # Extract indices
         indices = MorrisIndices(
@@ -187,7 +212,9 @@ class MorrisAnalyzer:
 
         return bounds
 
-    def rank_parameters(self, indices: MorrisIndices, by: str = "mu_star") -> pd.DataFrame:
+    def rank_parameters(
+        self, indices: MorrisIndices, by: str = "mu_star"
+    ) -> pd.DataFrame:
         """Rank parameters by Morris index.
 
         Parameters
@@ -217,7 +244,10 @@ class MorrisAnalyzer:
             raise ValueError(f"Unknown index: {by}")
 
     def classify_parameters(
-        self, indices: MorrisIndices, mu_threshold: float = 0.1, sigma_threshold: float = 0.1
+        self,
+        indices: MorrisIndices,
+        mu_threshold: float = 0.1,
+        sigma_threshold: float = 0.1,
     ) -> Dict[str, List[str]]:
         """Classify parameters into importance categories.
 

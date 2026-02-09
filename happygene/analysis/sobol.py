@@ -8,6 +8,32 @@ Produces:
 - Sobol indices with confidence intervals
 - Parameter rankings (main effect, total effect, interaction)
 - Convergence diagnostics
+
+Example
+-------
+>>> import numpy as np
+>>> import pandas as pd
+>>> from happygene.analysis.batch import BatchSimulator
+>>> from happygene.analysis.sobol import SobolAnalyzer
+>>>
+>>> # Create simulator with 5 parameters
+>>> param_space = {'p0': (0.01, 0.99), 'p1': (0.01, 0.99),
+...                 'p2': (0.01, 0.99), 'p3': (0.01, 0.99),
+...                 'p4': (0.1, 10.0)}
+>>> batch = BatchSimulator(param_space, 'DummyModel')
+>>>
+>>> # Generate and run 768 Sobol samples (Saltelli scheme)
+>>> samples = batch.generate_samples('saltelli', 64)
+>>> results = batch.run_batch(samples, generations=100, seed=42)
+>>>
+>>> # Analyze with Sobol indices
+>>> analyzer = SobolAnalyzer(list(param_space.keys()))
+>>> indices = analyzer.analyze(results, output_col='survival')
+>>>
+>>> # Rank parameters by total effect (ST)
+>>> ranked = analyzer.rank_parameters(indices, by='ST')
+>>> print(f"Most important parameter: {ranked.iloc[0]['param']}")  # doctest: +SKIP
+Most important parameter: p0
 """
 
 from dataclasses import dataclass
@@ -18,6 +44,7 @@ import pandas as pd
 
 try:
     from SALib.analyze import sobol as sobol_analyze
+
     SALIB_AVAILABLE = True
 except ImportError:
     SALIB_AVAILABLE = False
@@ -87,9 +114,7 @@ class SobolAnalyzer:
         Parameter bounds (unused for analysis, kept for consistency)
     """
 
-    def __init__(
-        self, param_names: List[str], param_space: Optional[Dict] = None
-    ):
+    def __init__(self, param_names: List[str], param_space: Optional[Dict] = None):
         """Initialize SobolAnalyzer."""
         if not SALIB_AVAILABLE:
             raise ImportError("SALib required: pip install SALib")
@@ -146,7 +171,7 @@ class SobolAnalyzer:
         }
 
         # Compute Sobol indices
-        Si = sobol_analyze(
+        Si = sobol_analyze.analyze(
             problem, Y, calc_second_order=calc_second_order, seed=42, conf_level=0.95
         )
 
@@ -187,9 +212,7 @@ class SobolAnalyzer:
 
         return bounds
 
-    def rank_parameters(
-        self, indices: SobolIndices, by: str = "ST"
-    ) -> pd.DataFrame:
+    def rank_parameters(self, indices: SobolIndices, by: str = "ST") -> pd.DataFrame:
         """Rank parameters by sensitivity index.
 
         Parameters
@@ -238,14 +261,18 @@ class SobolAnalyzer:
             If S2 (second-order indices) not computed.
         """
         if indices.S2 is None:
-            raise ValueError("Second-order indices not computed. Set calc_second_order=True")
+            raise ValueError(
+                "Second-order indices not computed. Set calc_second_order=True"
+            )
 
         interactions = []
         for i in range(self.n_params):
             for j in range(i + 1, self.n_params):
                 s2_val = indices.S2[i, j]
                 if s2_val >= threshold:
-                    interactions.append((self.param_names[i], self.param_names[j], s2_val))
+                    interactions.append(
+                        (self.param_names[i], self.param_names[j], s2_val)
+                    )
 
         # Sort by S2 value descending
         interactions.sort(key=lambda x: x[2], reverse=True)

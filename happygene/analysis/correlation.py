@@ -10,6 +10,30 @@ Detects parameter interactions through:
 Produces:
 - Correlation matrices
 - Interaction networks
+
+Example
+-------
+>>> from happygene.analysis.correlation import CorrelationAnalyzer
+>>> import numpy as np
+>>> import pandas as pd
+>>>
+>>> # Create sample batch results
+>>> np.random.seed(42)
+>>> params = ['p0', 'p1', 'p2', 'p3', 'p4']
+>>> X = np.random.rand(100, 5)
+>>> y = 0.5*X[:,0] + 0.3*X[:,1] + 0.1*np.random.rand(100)
+>>> df = pd.DataFrame(X, columns=params)
+>>> df['survival'] = y
+>>>
+>>> # Analyze correlations
+>>> analyzer = CorrelationAnalyzer(params)
+>>> corr_matrix = analyzer.compute_correlation_matrix(df)
+>>> p0_survival_corr = analyzer.parameter_output_correlation(df, 'survival')
+>>>
+>>> # First result should be p0 (highest correlation)
+>>> print(f"Top parameter: {p0_survival_corr.iloc[0]['param']}")  # doctest: +SKIP
+Top parameter: p0
+
 - Partial correlation analysis
 """
 
@@ -66,7 +90,10 @@ class CorrelationAnalyzer:
         return corr
 
     def parameter_output_correlation(
-        self, batch_results: pd.DataFrame, output_col: str = "survival", method: str = "pearson"
+        self,
+        batch_results: pd.DataFrame,
+        output_col: str = "survival",
+        method: str = "pearson",
     ) -> pd.DataFrame:
         """Compute correlation between parameters and output.
 

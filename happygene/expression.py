@@ -1,4 +1,5 @@
 """Expression models for gene regulation."""
+
 from abc import ABC, abstractmethod
 
 from happygene.conditions import Conditions
@@ -133,8 +134,8 @@ class HillExpression(ExpressionModel):
         Result is always in range [0, v_max].
         """
         tf = conditions.tf_concentration
-        tf_power = tf ** self.n
-        k_power = self.k ** self.n
+        tf_power = tf**self.n
+        k_power = self.k**self.n
         result = self.v_max * tf_power / (k_power + tf_power)
         return max(0.0, result)
 

@@ -1,4 +1,5 @@
 """Tests for selection models."""
+
 import pytest
 import numpy as np
 from happygene.entities import Gene, Individual
@@ -23,6 +24,7 @@ class TestSelectionModel:
 
     def test_selection_model_subclass_must_implement_compute_fitness(self):
         """Subclass must implement compute_fitness() method."""
+
         class BrokenSelection(SelectionModel):
             pass
 

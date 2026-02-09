@@ -26,7 +26,7 @@ class TestGeneNetwork:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
         assert isinstance(model, SimulationModel)
         assert model.generation == 0
@@ -44,7 +44,7 @@ class TestGeneNetwork:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
         assert len(model.individuals) == 2
         assert model.individuals[0].mean_expression() == 1.5
@@ -62,7 +62,7 @@ class TestGeneNetwork:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
         assert model.compute_mean_fitness() == 2.0
 
@@ -76,7 +76,7 @@ class TestGeneNetwork:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
         assert model.compute_mean_fitness() == 0.0
 
@@ -91,7 +91,7 @@ class TestGeneNetwork:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
         assert model.generation == 0
         model.step()
@@ -107,7 +107,7 @@ class TestGeneNetwork:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
         model.step()
         assert model.generation == 1
@@ -122,7 +122,7 @@ class TestGeneNetwork:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=123
+            seed=123,
         )
         val1 = model.rng.uniform()
 
@@ -131,7 +131,7 @@ class TestGeneNetwork:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=123
+            seed=123,
         )
         val2 = model2.rng.uniform()
 

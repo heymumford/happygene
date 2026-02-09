@@ -1,13 +1,13 @@
 """Tests for DataCollector (3-tier reporting)."""
-import pytest
+
 import pandas as pd
-from happygene.entities import Gene, Individual
-from happygene.model import GeneNetwork
-from happygene.conditions import Conditions
-from happygene.expression import LinearExpression
-from happygene.selection import ProportionalSelection
-from happygene.mutation import PointMutation
+
 from happygene.datacollector import DataCollector
+from happygene.entities import Gene, Individual
+from happygene.expression import LinearExpression
+from happygene.model import GeneNetwork
+from happygene.mutation import PointMutation
+from happygene.selection import ProportionalSelection
 
 
 class TestDataCollector:
@@ -27,7 +27,7 @@ class TestDataCollector:
         collector = DataCollector(
             model_reporters=model_reporters,
             individual_reporters=individual_reporters,
-            gene_reporters=gene_reporters
+            gene_reporters=gene_reporters,
         )
         assert collector is not None
 
@@ -47,7 +47,7 @@ class TestDataCollector:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Collect at generation 0
@@ -70,7 +70,7 @@ class TestDataCollector:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Collect over 5 generations
@@ -97,7 +97,7 @@ class TestDataCollector:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         for _ in range(3):
@@ -132,7 +132,7 @@ class TestDataCollector:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         collector.collect(network)
@@ -154,7 +154,7 @@ class TestDataCollector:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         for _ in range(3):
@@ -182,7 +182,7 @@ class TestDataCollector:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         collector.collect(network)
@@ -204,7 +204,7 @@ class TestDataCollector:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         for _ in range(3):
@@ -219,10 +219,7 @@ class TestDataCollector:
     def test_datacollector_max_history_limits_rows(self):
         """max_history parameter limits DataFrame rows to most recent."""
         model_reporters = {"generation": lambda m: m.generation}
-        collector = DataCollector(
-            model_reporters=model_reporters,
-            max_history=5
-        )
+        collector = DataCollector(model_reporters=model_reporters, max_history=5)
 
         genes = [Gene("geneA", 1.0)]
         individual = Individual(genes)
@@ -235,7 +232,7 @@ class TestDataCollector:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Collect 10 times, but max_history=5

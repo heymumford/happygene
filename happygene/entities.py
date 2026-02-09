@@ -1,4 +1,5 @@
 """Gene and Individual entity classes."""
+
 from typing import List
 
 
