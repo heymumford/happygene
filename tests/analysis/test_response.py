@@ -6,13 +6,13 @@ Test Tiers:
 3. Chaos Tests: Predict before fit, invalid methods
 """
 
-import pytest
 import numpy as np
 import pandas as pd
-
-sklearn = pytest.importorskip("sklearn")
+import pytest
 
 from happygene.analysis.response import ResponseSurfaceModel
+
+sklearn = pytest.importorskip("sklearn")
 
 
 @pytest.fixture

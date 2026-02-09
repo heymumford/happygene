@@ -1,6 +1,5 @@
 """Tests for Gene and Individual entities."""
 
-import pytest
 from happygene.entities import Gene, Individual
 
 

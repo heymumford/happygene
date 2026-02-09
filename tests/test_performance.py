@@ -1,12 +1,13 @@
 """Performance benchmarks for large-scale simulations."""
 
 import pytest
-from happygene.entities import Gene, Individual
-from happygene.model import GeneNetwork
+
 from happygene.datacollector import DataCollector
+from happygene.entities import Gene, Individual
 from happygene.expression import ConstantExpression
-from happygene.selection import ProportionalSelection
+from happygene.model import GeneNetwork
 from happygene.mutation import PointMutation
+from happygene.selection import ProportionalSelection
 
 
 class TestPerformanceBenchmarks:

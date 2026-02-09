@@ -12,13 +12,14 @@ realistic gene regulatory dynamics with cooperative binding.
 """
 
 import sys
-from happygene.entities import Gene, Individual
-from happygene.model import GeneNetwork
+
 from happygene.conditions import Conditions
-from happygene.expression import HillExpression
-from happygene.selection import ThresholdSelection
-from happygene.mutation import PointMutation
 from happygene.datacollector import DataCollector
+from happygene.entities import Gene, Individual
+from happygene.expression import HillExpression
+from happygene.model import GeneNetwork
+from happygene.mutation import PointMutation
+from happygene.selection import ThresholdSelection
 
 
 def create_regulatory_individuals(num_individuals, num_genes):
@@ -49,7 +50,7 @@ def main():
     print(
         f"  ✓ Created {num_individuals} individuals with {num_genes} regulatory genes"
     )
-    print(f"    Gene names: TF1, TF2, TF3, TF4, TF5 (transcription factors)")
+    print("    Gene names: TF1, TF2, TF3, TF4, TF5 (transcription factors)")
 
     # Step 2: Configure Hill kinetics expression model
     print("\n[2/6] Configuring Hill kinetics expression model...")
@@ -60,7 +61,7 @@ def main():
         k=0.5,  # Half-saturation point (Km)
         n=2.0,  # Hill coefficient (cooperativity: 2 = stronger cooperativity)
     )
-    print(f"  ✓ HillExpression configured:")
+    print("  ✓ HillExpression configured:")
     print(f"    v_max={hill_model.v_max} (max expression)")
     print(f"    k={hill_model.k} (half-saturation)")
     print(f"    n={hill_model.n} (Hill coefficient - cooperativity)")
@@ -69,7 +70,7 @@ def main():
     print("\n[3/6] Configuring threshold-based selection...")
     # Only individuals with mean expression > threshold survive
     threshold_model = ThresholdSelection(threshold=0.4)
-    print(f"  ✓ ThresholdSelection configured:")
+    print("  ✓ ThresholdSelection configured:")
     print(f"    threshold={threshold_model.threshold}")
     print(
         f"    Selection rule: fitness = 1.0 if mean_expr > {threshold_model.threshold}, else 0.0"
@@ -78,7 +79,7 @@ def main():
     # Step 4: Configure mutation model
     print("\n[4/6] Configuring mutation model...")
     mutate_model = PointMutation(rate=0.2, magnitude=0.1)
-    print(f"  ✓ PointMutation configured:")
+    print("  ✓ PointMutation configured:")
     print(f"    rate={mutate_model.rate} (probability per gene per generation)")
     print(f"    magnitude={mutate_model.magnitude} (standard deviation of change)")
 
@@ -118,14 +119,14 @@ def main():
             "expression_level": lambda gene: gene.expression_level,
         },
     )
-    print(f"  ✓ GeneNetwork created with multi-level DataCollector")
+    print("  ✓ GeneNetwork created with multi-level DataCollector")
     print(
         f"  ✓ Environmental conditions: tf_concentration={conditions.tf_concentration}"
     )
-    print(f"  ✓ Model reporters: mean_fitness, mean_expression")
-    print(f"  ✓ Individual reporters: fitness, mean_expression")
-    print(f"  ✓ Gene reporters: expression_level")
-    print(f"  ✓ Reproducible seed: 42")
+    print("  ✓ Model reporters: mean_fitness, mean_expression")
+    print("  ✓ Individual reporters: fitness, mean_expression")
+    print("  ✓ Gene reporters: expression_level")
+    print("  ✓ Reproducible seed: 42")
 
     # Step 6: Run simulation
     print("\n[6/6] Running simulation...")
@@ -161,7 +162,7 @@ def main():
         initial_fitness = final_fitness = max_fitness = min_fitness = mean_fitness = 0.0
         initial_expr = final_expr = max_expr = 0.0
 
-    print(f"\nPopulation Statistics:")
+    print("\nPopulation Statistics:")
     print(f"  Population size:         {num_individuals} individuals")
     print(f"  Regulatory genes:        {num_genes} genes (TF1-TF5)")
     print(f"  Generations simulated:   {num_generations}")
@@ -174,40 +175,37 @@ def main():
     print(f"  Mean fitness (all gens): {mean_fitness:.4f}")
     print(f"  Maximum fitness:         {max_fitness:.4f}")
     print(f"  Minimum fitness:         {min_fitness:.4f}")
-    print(
-        f"  Selection pressure:      {'Strong' if final_fitness > mean_fitness else 'Weak'} (final > mean)"
-    )
+    pressure = "Strong" if final_fitness > mean_fitness else "Weak"
+    print(f"  Selection pressure:      {pressure} (final > mean)")
 
-    print(f"\nExpression Summary (Hill Kinetics):")
+    print("\nExpression Summary (Hill Kinetics):")
     print(f"  Initial mean expression: {initial_expr:.4f}")
     print(f"  Final mean expression:   {final_expr:.4f}")
     print(f"  Maximum expression:      {max_expr:.4f}")
-    print(
-        f"  Expression trend:        {'↑ Increasing' if final_expr > initial_expr else '↓ Decreasing'}"
-    )
+    trend = "↑ Increasing" if final_expr > initial_expr else "↓ Decreasing"
+    print(f"  Expression trend:        {trend}")
 
-    print(f"\nData Collection Summary:")
+    print("\nData Collection Summary:")
     print(f"  Model-level records:     {len(model_df)} (1 per generation)")
     print(f"  Individual records:      {len(individual_df)}")
     print(f"  Gene records:            {len(gene_df)}")
 
     # Calculate selection pressure effects
-    print(f"\nSelection Pressure Analysis:")
+    print("\nSelection Pressure Analysis:")
     survivors_per_gen = individual_df.groupby("generation")["fitness"].apply(
         lambda x: (x > 0).sum()
     )
     if len(survivors_per_gen) > 0:
         avg_survivors = survivors_per_gen.mean()
-        print(
-            f"  Average survivors/gen:   {avg_survivors:.1f}/{num_individuals} ({100*avg_survivors/num_individuals:.1f}%)"
-        )
+        pct = 100 * avg_survivors / num_individuals
+        print(f"  Average survivors/gen:   {avg_survivors:.1f}/{num_individuals} ({pct:.1f}%)")
         print(f"  Bottleneck threshold:    {threshold_model.threshold}")
 
     # Gene-level statistics
     if len(gene_df) > 0:
         final_gen_genes = gene_df[gene_df["generation"] == num_generations]
         if len(final_gen_genes) > 0:
-            print(f"\nGene Expression (Final Generation):")
+            print("\nGene Expression (Final Generation):")
             print(
                 f"  Mean expression level:   {final_gen_genes['expression_level'].mean():.4f}"
             )
@@ -225,7 +223,7 @@ def main():
     try:
         import matplotlib.pyplot as plt
 
-        print(f"\n[OPTIONAL] Generating visualization...")
+        print("\n[OPTIONAL] Generating visualization...")
         fig, axes = plt.subplots(2, 2, figsize=(14, 10))
 
         # Plot 1: Mean fitness over time
@@ -313,24 +311,24 @@ def main():
         plt.close()
 
     except ImportError:
-        print(f"\n[INFO] matplotlib not installed (optional dependency)")
-        print(f"       To visualize results, install: pip install matplotlib")
+        print("\n[INFO] matplotlib not installed (optional dependency)")
+        print("       To visualize results, install: pip install matplotlib")
 
     print("\n" + "=" * 80)
     print("SIMULATION COMPLETE")
     print("=" * 80)
-    print(f"\nKey Insights:")
-    print(f"  - Hill kinetics models sigmoidal gene response (cooperative binding)")
-    print(f"  - Threshold selection creates bottlenecks (only fit individuals survive)")
-    print(f"  - Evolution toward higher expression/fitness or oscillation possible")
+    print("\nKey Insights:")
+    print("  - Hill kinetics models sigmoidal gene response (cooperative binding)")
+    print("  - Threshold selection creates bottlenecks (only fit individuals survive)")
+    print("  - Evolution toward higher expression/fitness or oscillation possible")
     print(
-        f"  - This pattern models real regulatory networks (e.g., developmental genes)"
+        "  - This pattern models real regulatory networks (e.g., developmental genes)"
     )
-    print(f"\nNext steps:")
-    print(f"  - Compare with constant expression model (see simple_duplication.py)")
-    print(f"  - Try different threshold values (0.2, 0.5, 0.8)")
-    print(f"  - Modify Hill coefficient n (1.0=linear, 2.0+=cooperative)")
-    print(f"  - See happygene documentation for advanced multi-gene regulation")
+    print("\nNext steps:")
+    print("  - Compare with constant expression model (see simple_duplication.py)")
+    print("  - Try different threshold values (0.2, 0.5, 0.8)")
+    print("  - Modify Hill coefficient n (1.0=linear, 2.0+=cooperative)")
+    print("  - See happygene documentation for advanced multi-gene regulation")
 
 
 if __name__ == "__main__":

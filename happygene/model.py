@@ -1,12 +1,13 @@
 """GeneNetwork: the main simulation model."""
 
 from typing import List
+
 from happygene.base import SimulationModel
-from happygene.entities import Individual
 from happygene.conditions import Conditions
+from happygene.entities import Individual
 from happygene.expression import ExpressionModel
-from happygene.selection import SelectionModel
 from happygene.mutation import MutationModel
+from happygene.selection import SelectionModel
 
 
 class GeneNetwork(SimulationModel):

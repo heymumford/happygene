@@ -9,14 +9,12 @@ Complete example showing:
 5. Results export
 """
 
-import numpy as np
-import pandas as pd
 from pathlib import Path
 
-from happygene.model import Model
 from happygene.analysis.batch import BatchSimulator
-from happygene.analysis.sobol import SobolAnalyzer
 from happygene.analysis.output import OutputExporter
+from happygene.analysis.sobol import SobolAnalyzer
+from happygene.model import Model
 
 
 class DummyModel(Model):
@@ -125,7 +123,7 @@ def main():
     else:
         print("  No significant interactions detected")
 
-    print(f"\n✓ Sobol workflow complete!")
+    print("\n✓ Sobol workflow complete!")
     print(f"  Output directory: {output_dir}")
 
 

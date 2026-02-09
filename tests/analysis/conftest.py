@@ -8,15 +8,14 @@ Provides:
 - Mock results for testing analyzers
 """
 
-import pytest
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
+import pytest
+
+from engine.domain.config import KineticsConfig
 
 # Import from main HappyGene engine (assumes in sys.path)
-from engine.domain.models import DamageProfile
-from engine.domain.config import HappyGeneConfig, KineticsConfig
-from engine.simulator.batch import BatchSimulator as HappyGeneBatchSimulator
 
 
 @pytest.fixture

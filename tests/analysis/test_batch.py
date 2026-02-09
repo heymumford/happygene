@@ -8,10 +8,10 @@ Test Tiers:
 4. Performance Tests: Scaling with n_samples and n_generations
 """
 
-import pytest
 import numpy as np
 import pandas as pd
-from hypothesis import given, settings, HealthCheck
+import pytest
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from happygene.analysis.batch import BatchSimulator

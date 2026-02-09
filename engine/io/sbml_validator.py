@@ -25,9 +25,9 @@ Validates SBML documents for:
 Production implementation with comprehensive validation.
 """
 
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Union
-import xml.etree.ElementTree as ET
 
 SBML_NAMESPACE = "http://www.sbml.org/sbml/level3/version2"
 

@@ -32,12 +32,6 @@ from typing import Any, Dict, List
 import plotly.graph_objects as go
 import plotly.subplots
 
-from engine.visualization.plotter import (
-    plot_repair_distribution,
-    plot_repair_time_series,
-    plot_statistics_summary,
-)
-
 
 class Dashboard:
     """Interactive dashboard for simulation results.

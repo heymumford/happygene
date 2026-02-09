@@ -1,6 +1,7 @@
 """SimulationModel: abstract base for all happygene simulations (ADR-001)."""
 
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 

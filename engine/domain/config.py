@@ -22,9 +22,10 @@ Ensures configuration is valid before simulation starts.
 Principle: All user input validated at boundaries. Clear error messages.
 """
 
-from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
-from typing import List, Optional, Dict, Any
 from enum import Enum
+from typing import Any, Dict, List
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # ============================================================================
 # Enums for Config Options

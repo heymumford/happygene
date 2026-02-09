@@ -1,10 +1,11 @@
 """Tests for selection models."""
 
 import pytest
+
 from happygene.entities import Gene, Individual
 from happygene.selection import (
-    SelectionModel,
     ProportionalSelection,
+    SelectionModel,
     ThresholdSelection,
 )
 

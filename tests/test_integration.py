@@ -1,12 +1,11 @@
 """Integration tests for full simulation loop."""
 
-import pytest
-from happygene.entities import Gene, Individual
-from happygene.model import GeneNetwork
 from happygene.conditions import Conditions
+from happygene.entities import Gene, Individual
 from happygene.expression import LinearExpression
-from happygene.selection import ProportionalSelection
+from happygene.model import GeneNetwork
 from happygene.mutation import PointMutation
+from happygene.selection import ProportionalSelection
 
 
 class TestFullSimulationLoop:
@@ -134,7 +133,6 @@ class TestFullSimulationLoop:
             seed=42,
         )
 
-        initial_expr = individual.genes[0].expression_level
         network.step()
 
         # Gene expression likely changed due to high mutation rate

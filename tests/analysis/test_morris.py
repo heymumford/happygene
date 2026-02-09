@@ -6,9 +6,8 @@ Test Tiers:
 3. Chaos Tests: Invalid inputs, edge cases
 """
 
-import pytest
 import numpy as np
-import pandas as pd
+import pytest
 
 from happygene.analysis.morris import MorrisAnalyzer, MorrisIndices
 

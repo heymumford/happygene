@@ -1,11 +1,10 @@
 """Edge case tests: boundary conditions and extreme parameters."""
 
-import pytest
 from happygene.entities import Gene, Individual
-from happygene.model import GeneNetwork
 from happygene.expression import ConstantExpression, HillExpression
-from happygene.selection import ProportionalSelection
+from happygene.model import GeneNetwork
 from happygene.mutation import PointMutation
+from happygene.selection import ProportionalSelection
 
 
 class TestEdgeCases:

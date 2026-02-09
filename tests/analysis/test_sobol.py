@@ -7,9 +7,8 @@ Test Tiers:
 4. Integration Tests: Full analyze → rank → detect workflow
 """
 
-import pytest
 import numpy as np
-import pandas as pd
+import pytest
 
 from happygene.analysis.sobol import SobolAnalyzer, SobolIndices
 

@@ -1,12 +1,11 @@
 """Tests for GeneNetwork model."""
 
-import pytest
 from happygene.base import SimulationModel
 from happygene.entities import Gene, Individual
-from happygene.model import GeneNetwork
 from happygene.expression import LinearExpression
-from happygene.selection import ProportionalSelection
+from happygene.model import GeneNetwork
 from happygene.mutation import PointMutation
+from happygene.selection import ProportionalSelection
 
 
 class TestGeneNetwork:

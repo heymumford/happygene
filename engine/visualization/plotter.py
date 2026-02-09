@@ -64,7 +64,6 @@ def plot_repair_time_series(results: List[Dict[str, Any]]) -> go.Figure:
         )
         return fig
 
-    run_ids = [r.get("run_id") for r in results]
     times = [r.get("completion_time") for r in results]
     repair_counts = [r.get("final_repair_count") for r in results]
 

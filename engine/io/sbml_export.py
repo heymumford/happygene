@@ -28,12 +28,12 @@ SBML Structure:
 Production implementation with full SBML compliance.
 """
 
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Union
-import xml.etree.ElementTree as ET
 
-from engine.domain.models import DamageProfile, DamageType, RepairPathway
 from engine.domain.config import HappyGeneConfig
+from engine.domain.models import DamageProfile, DamageType, RepairPathway
 
 # SBML namespace for proper XML generation
 SBML_NAMESPACE = "http://www.sbml.org/sbml/level3/version2"
@@ -162,7 +162,7 @@ def _add_reactions(model: ET.Element) -> None:
 
         # k * S (rate constant times substrate concentration)
         apply = ET.SubElement(math, "apply")
-        times = ET.SubElement(apply, "times")
+        ET.SubElement(apply, "times")
         ci_k = ET.SubElement(apply, "ci")
         ci_k.text = f"k_{pathway.value}"
         ci_s = ET.SubElement(apply, "ci")

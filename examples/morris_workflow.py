@@ -9,14 +9,12 @@ Complete example showing:
 5. Results export and interpretation
 """
 
-import numpy as np
-import pandas as pd
 from pathlib import Path
 
-from happygene.model import Model
 from happygene.analysis.batch import BatchSimulator
 from happygene.analysis.morris import MorrisAnalyzer
 from happygene.analysis.output import OutputExporter
+from happygene.model import Model
 
 
 class DummyModel(Model):
@@ -141,7 +139,7 @@ def main():
         mu_star_val = indices.mu_star[indices.param_names.index(param)]
         print(f"  {param}: μ={mu_val:.3f}, σ={sigma_val:.3f}, μ*={mu_star_val:.3f}")
 
-    print(f"\n✓ Morris workflow complete!")
+    print("\n✓ Morris workflow complete!")
     print(f"  Output directory: {output_dir}")
 
 

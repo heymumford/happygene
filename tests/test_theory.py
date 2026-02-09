@@ -1,13 +1,12 @@
 """Theory validation tests: neutral drift, selection response, reproducibility."""
 
-import pytest
 import numpy as np
+
 from happygene.entities import Gene, Individual
-from happygene.model import GeneNetwork
-from happygene.conditions import Conditions
 from happygene.expression import ConstantExpression
-from happygene.selection import ProportionalSelection
+from happygene.model import GeneNetwork
 from happygene.mutation import PointMutation
+from happygene.selection import ProportionalSelection
 
 
 class TestNeutralDrift:
@@ -51,9 +50,11 @@ class TestNeutralDrift:
 
         # All fitness values should be ~1.0 (constant)
         fitness_history = np.array(fitness_history)
+        mean_f = fitness_history.mean()
+        std_f = fitness_history.std()
         assert np.allclose(
             fitness_history, 1.0
-        ), f"Fitness not constant under neutral drift: mean={fitness_history.mean()}, std={fitness_history.std()}"
+        ), f"Fitness not constant: mean={mean_f}, std={std_f}"
 
         # Variance should be zero (or very close due to floating point)
         assert (
@@ -93,9 +94,6 @@ class TestSelectionResponse:
             mutation_model=mutate_model,
             seed=42,
         )
-
-        # Record initial mean fitness
-        initial_fitness = network.compute_mean_fitness()
 
         # Run 50 generations to allow mutations to accumulate
         network.run(50)
@@ -155,9 +153,11 @@ class TestReproducibility:
         fitness_history_1 = np.array(fitness_history_1)
         fitness_history_2 = np.array(fitness_history_2)
 
-        assert np.allclose(
-            fitness_history_1, fitness_history_2
-        ), f"Reproducibility failed: histories differ\nSim1: {fitness_history_1}\nSim2: {fitness_history_2}"
+        msg = (
+            f"Reproducibility failed: histories differ\n"
+            f"Sim1: {fitness_history_1}\nSim2: {fitness_history_2}"
+        )
+        assert np.allclose(fitness_history_1, fitness_history_2), msg
 
     def test_different_seeds_produce_different_results(self):
         """Different seeds should produce different mutation patterns.

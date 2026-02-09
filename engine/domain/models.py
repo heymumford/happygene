@@ -25,9 +25,9 @@ No side effects. Stateless.
 """
 
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import List, Optional, Tuple
 from datetime import datetime
+from enum import Enum
+from typing import Tuple
 
 # ============================================================================
 # Enums: Type-Safe Domain Values
@@ -185,11 +185,11 @@ class RepairEvent:
                 f"start_time > end_time: {self.start_time} > {self.end_time}"
             )
         if self.start_time < 0 or self.end_time < 0:
-            raise ValueError(f"Repair times cannot be negative")
+            raise ValueError("Repair times cannot be negative")
         if not 0 <= self.fidelity <= 1:
             raise ValueError(f"fidelity must be in [0, 1], got {self.fidelity}")
         if self.lesions_repaired < 0 or self.lesions_unrepaired < 0:
-            raise ValueError(f"Lesion counts cannot be negative")
+            raise ValueError("Lesion counts cannot be negative")
 
     @property
     def duration_seconds(self) -> float:
@@ -242,7 +242,7 @@ class RepairOutcome:
 
         # Success criteria
         if self.success and self.total_unrepaired > 0:
-            raise ValueError(f"success=True but unrepaired lesions remain")
+            raise ValueError("success=True but unrepaired lesions remain")
 
     def outcome_summary(self) -> dict:
         """

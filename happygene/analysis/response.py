@@ -34,9 +34,10 @@ Example
 R²: 0.950
 """
 
+from typing import Dict, List
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Optional, Tuple, List
 
 
 class ResponseSurfaceModel:
@@ -78,9 +79,9 @@ class ResponseSurfaceModel:
             For method chaining.
         """
         # Lazy imports to avoid hard dependencies
-        from sklearn.preprocessing import StandardScaler
-        from sklearn.linear_model import LinearRegression
         from sklearn.ensemble import RandomForestRegressor
+        from sklearn.linear_model import LinearRegression
+        from sklearn.preprocessing import StandardScaler
 
         # Re-initialize scaler with proper import
         self.scaler = StandardScaler()
@@ -174,9 +175,9 @@ class ResponseSurfaceModel:
         dict
             Metrics: 'r2', 'rmse', 'mae' (mean absolute error)
         """
-        from sklearn.metrics import mean_absolute_error, mean_squared_error
-        from sklearn.linear_model import LinearRegression
         from sklearn.ensemble import RandomForestRegressor
+        from sklearn.linear_model import LinearRegression
+        from sklearn.metrics import mean_absolute_error, mean_squared_error
 
         param_cols = [p for p in self.param_names if p in batch_results.columns]
         X = batch_results[param_cols].values

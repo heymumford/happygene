@@ -6,9 +6,9 @@ Test Tiers:
 3. Chaos Tests: Invalid methods, missing columns
 """
 
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
 
 from happygene.analysis.correlation import CorrelationAnalyzer
 

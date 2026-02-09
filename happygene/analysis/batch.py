@@ -7,13 +7,14 @@ Orchestrates:
 - Result collection and DataFrame export
 """
 
+from datetime import datetime
+from typing import Callable, Dict, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Callable, Dict, Tuple, Optional, List
-from datetime import datetime
 
 try:
-    from SALib.sample import saltelli, morris
+    from SALib.sample import morris, saltelli
     from SALib.sample.sobol import sample as sobol_sample
 
     SALIB_AVAILABLE = True
@@ -22,9 +23,10 @@ except ImportError:
 
 from engine.domain.config import HappyGeneConfig
 from engine.simulator.batch import BatchSimulator as HappyGeneBatchSimulator
+
 from ._internal import (
-    SeedManager,
     ParameterValidator,
+    SeedManager,
     denormalize_samples,
     generate_run_id,
 )

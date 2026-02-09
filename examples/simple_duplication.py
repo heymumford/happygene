@@ -12,13 +12,13 @@ No external visualization required (optional matplotlib visualization included).
 """
 
 import sys
-from happygene.entities import Gene, Individual
-from happygene.model import GeneNetwork
-from happygene.conditions import Conditions
-from happygene.expression import ConstantExpression
-from happygene.selection import ProportionalSelection
-from happygene.mutation import PointMutation
+
 from happygene.datacollector import DataCollector
+from happygene.entities import Gene, Individual
+from happygene.expression import ConstantExpression
+from happygene.model import GeneNetwork
+from happygene.mutation import PointMutation
+from happygene.selection import ProportionalSelection
 
 
 def main():
@@ -64,7 +64,7 @@ def main():
         gene_reporters={"expression_level": lambda gene: gene.expression_level},
     )
     print("  ✓ GeneNetwork created with DataCollector")
-    print(f"  ✓ Reproducible seed: 42")
+    print("  ✓ Reproducible seed: 42")
 
     # Step 4: Run simulation
     print("\n[4/5] Running simulation...")
@@ -92,18 +92,18 @@ def main():
     print("\n" + "=" * 70)
     print("SIMULATION RESULTS")
     print("=" * 70)
-    print(f"\nPopulation Statistics:")
+    print("\nPopulation Statistics:")
     print(f"  Population size:        {num_individuals} individuals")
     print(f"  Genes per individual:   {num_genes} genes")
     print(f"  Generations simulated:  {num_generations}")
 
-    print(f"\nFitness Summary (ProportionalSelection):")
+    print("\nFitness Summary (ProportionalSelection):")
     print(f"  Initial mean fitness:   {initial_fitness:.4f}")
     print(f"  Final mean fitness:     {final_fitness:.4f}")
     print(f"  Maximum fitness:        {max_fitness:.4f}")
     print(f"  Minimum fitness:        {min_fitness:.4f}")
 
-    print(f"\nData Collection Summary:")
+    print("\nData Collection Summary:")
     print(f"  Model-level records:    {len(model_df)}")
     print(f"  Individual records:     {len(individual_df)}")
     print(f"  Gene records:           {len(gene_df)}")
@@ -112,7 +112,7 @@ def main():
     try:
         import matplotlib.pyplot as plt
 
-        print(f"\n[OPTIONAL] Generating visualization...")
+        print("\n[OPTIONAL] Generating visualization...")
         fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 
         # Plot 1: Mean fitness over time
@@ -147,16 +147,16 @@ def main():
         plt.close()
 
     except ImportError:
-        print(f"\n[INFO] matplotlib not installed (optional dependency)")
-        print(f"       To visualize results, install: pip install matplotlib")
+        print("\n[INFO] matplotlib not installed (optional dependency)")
+        print("       To visualize results, install: pip install matplotlib")
 
     print("\n" + "=" * 70)
     print("SIMULATION COMPLETE")
     print("=" * 70)
-    print(f"\nNext steps:")
-    print(f"  - Try modifying num_individuals, num_genes, or num_generations")
-    print(f"  - Experiment with different expression/selection/mutation models")
-    print(f"  - See happygene documentation for advanced examples")
+    print("\nNext steps:")
+    print("  - Try modifying num_individuals, num_genes, or num_generations")
+    print("  - Experiment with different expression/selection/mutation models")
+    print("  - See happygene documentation for advanced examples")
 
 
 if __name__ == "__main__":

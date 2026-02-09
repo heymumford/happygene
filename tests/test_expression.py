@@ -1,12 +1,13 @@
 """Tests for expression models and conditions."""
 
 import pytest
+
 from happygene.conditions import Conditions
 from happygene.expression import (
-    ExpressionModel,
-    LinearExpression,
     ConstantExpression,
+    ExpressionModel,
     HillExpression,
+    LinearExpression,
 )
 
 

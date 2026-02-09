@@ -1,6 +1,7 @@
 """Selection models for population fitness evaluation."""
 
 from abc import ABC, abstractmethod
+
 from happygene.entities import Individual
 
 

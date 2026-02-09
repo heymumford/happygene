@@ -36,10 +36,11 @@ Example
 Most important parameter: p0
 """
 
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Tuple, Optional, List
-from dataclasses import dataclass
 
 try:
     from SALib.analyze import sobol as sobol_analyze
@@ -160,7 +161,6 @@ class SobolAnalyzer:
                 f"Expected {self.n_params} params, found {len(param_cols)}"
             )
 
-        X = batch_results[param_cols].values
         Y = batch_results[output_col].values
 
         # Define problem for SALib

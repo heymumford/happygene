@@ -28,12 +28,12 @@ Validation:
 Production implementation with full round-trip fidelity.
 """
 
-from pathlib import Path
-from typing import Union, Tuple, Dict
 import xml.etree.ElementTree as ET
+from pathlib import Path
+from typing import Dict, Tuple, Union
 
-from engine.domain.models import Lesion, DamageProfile, DamageType, CellCyclePhase
 from engine.domain.config import KineticsConfig, SolverMethod
+from engine.domain.models import CellCyclePhase, DamageProfile, DamageType, Lesion
 
 SBML_NAMESPACE = "http://www.sbml.org/sbml/level3/version2"
 

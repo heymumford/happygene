@@ -1,7 +1,7 @@
 """Tests for mutation models."""
 
 import pytest
-from happygene.entities import Gene, Individual
+
 from happygene.mutation import MutationModel, PointMutation
 
 

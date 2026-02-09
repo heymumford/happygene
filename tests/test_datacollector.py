@@ -1,14 +1,13 @@
 """Tests for DataCollector (3-tier reporting)."""
 
-import pytest
 import pandas as pd
-from happygene.entities import Gene, Individual
-from happygene.model import GeneNetwork
-from happygene.conditions import Conditions
-from happygene.expression import LinearExpression
-from happygene.selection import ProportionalSelection
-from happygene.mutation import PointMutation
+
 from happygene.datacollector import DataCollector
+from happygene.entities import Gene, Individual
+from happygene.expression import LinearExpression
+from happygene.model import GeneNetwork
+from happygene.mutation import PointMutation
+from happygene.selection import ProportionalSelection
 
 
 class TestDataCollector:
