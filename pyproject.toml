@@ -32,6 +32,15 @@ dev = [
     "pytest-cov>=5.0",
     "ruff>=0.4",
     "pytest-xdist>=3.5",
+    "mypy>=1.8",
+    "black>=24.0",
+    "isort>=5.13",
+    "coverage>=7.0",
+]
+io = [
+    "pydantic>=2.0",
+    "scikit-learn>=1.3",
+    "statsmodels>=0.14",
 ]
 docs = [
     "sphinx>=7.0",

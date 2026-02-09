@@ -25,7 +25,23 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -e ".[dev]"
+        pip install -e .[dev,io]
+
+    - name: Type check with mypy
+      run: |
+        mypy happygene --strict
+
+    - name: Format check with black
+      run: |
+        black --check .
+
+    - name: Lint with ruff
+      run: |
+        ruff check .
+
+    - name: Sort imports with isort
+      run: |
+        isort --check-only .
 
     - name: Run pytest with coverage
       run: |
