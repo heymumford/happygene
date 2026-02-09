@@ -166,3 +166,36 @@ class SexualReproduction:
 
     def __repr__(self) -> str:
         return f"SexualReproduction(crossover_rate={self.crossover_rate})"
+
+
+class AsexualReproduction:
+    """Asexual reproduction model with cloning.
+
+    Produces genetically identical offspring via cloning (no genetic recombination).
+    Useful for studying neutral evolution and drift without selection.
+    """
+
+    def clone(self, parent: Individual) -> Individual:
+        """Produce offspring via cloning (exact genetic copy).
+
+        Creates a new Individual with genes that are exact copies of the parent.
+        Expression levels preserved. Gene objects are new instances, not references.
+
+        Parameters
+        ----------
+        parent : Individual
+            Parent individual to clone.
+
+        Returns
+        -------
+        Individual
+            Offspring individual (genetically identical to parent).
+        """
+        # Create new gene objects with same names and expression levels
+        offspring_genes = [
+            Gene(gene.name, gene.expression_level) for gene in parent.genes
+        ]
+        return Individual(offspring_genes)
+
+    def __repr__(self) -> str:
+        return "AsexualReproduction()"

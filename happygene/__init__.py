@@ -21,6 +21,7 @@ from happygene.regulatory_expression import (
 )
 from happygene.regulatory_network import RegulationConnection, RegulatoryNetwork
 from happygene.selection import (
+    AsexualReproduction,
     ProportionalSelection,
     SelectionModel,
     SexualReproduction,
@@ -45,6 +46,7 @@ __all__ = [
     "ProportionalSelection",
     "ThresholdSelection",
     "SexualReproduction",
+    "AsexualReproduction",
     "MutationModel",
     "PointMutation",
     "DataCollector",

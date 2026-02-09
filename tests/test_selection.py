@@ -6,6 +6,7 @@ from happygene.selection import (
     ProportionalSelection,
     ThresholdSelection,
     SexualReproduction,
+    AsexualReproduction,
 )
 
 
@@ -218,3 +219,76 @@ class TestSexualReproduction:
         repr_str = repr(selector)
         assert "SexualReproduction" in repr_str
         assert "0.7" in repr_str
+
+
+class TestAsexualReproduction:
+    """Tests for AsexualReproduction model (cloning)."""
+
+    def test_asexual_reproduction_creation(self):
+        """AsexualReproduction can be instantiated."""
+        reproducer = AsexualReproduction()
+        assert reproducer is not None
+
+    def test_asexual_reproduction_clone_produces_copy(self):
+        """clone() produces an exact copy of parent."""
+        reproducer = AsexualReproduction()
+        parent = Individual([Gene("g1", 1.0), Gene("g2", 2.0)])
+
+        offspring = reproducer.clone(parent)
+
+        # Offspring should be a different object
+        assert offspring is not parent
+        # But have same genes and expression levels
+        assert len(offspring.genes) == len(parent.genes)
+        for i, gene in enumerate(offspring.genes):
+            assert gene.name == parent.genes[i].name
+            assert gene.expression_level == parent.genes[i].expression_level
+
+    def test_asexual_reproduction_clone_single_gene(self):
+        """clone() handles single gene correctly."""
+        reproducer = AsexualReproduction()
+        parent = Individual([Gene("g1", 3.5)])
+
+        offspring = reproducer.clone(parent)
+
+        assert len(offspring.genes) == 1
+        assert offspring.genes[0].name == "g1"
+        assert offspring.genes[0].expression_level == 3.5
+
+    def test_asexual_reproduction_clone_multiple_genes(self):
+        """clone() handles multiple genes correctly."""
+        reproducer = AsexualReproduction()
+        parent = Individual([Gene(f"g{i}", float(i + 1)) for i in range(5)])
+
+        offspring = reproducer.clone(parent)
+
+        assert len(offspring.genes) == 5
+        for i in range(5):
+            assert offspring.genes[i].name == f"g{i}"
+            assert offspring.genes[i].expression_level == float(i + 1)
+
+    def test_asexual_reproduction_clone_zero_expression(self):
+        """clone() handles zero expression levels."""
+        reproducer = AsexualReproduction()
+        parent = Individual([Gene("g1", 0.0), Gene("g2", 0.0)])
+
+        offspring = reproducer.clone(parent)
+
+        assert offspring.genes[0].expression_level == 0.0
+        assert offspring.genes[1].expression_level == 0.0
+
+    def test_asexual_reproduction_clone_empty_individual(self):
+        """clone() handles empty individual (no genes)."""
+        reproducer = AsexualReproduction()
+        parent = Individual([])
+
+        offspring = reproducer.clone(parent)
+
+        assert len(offspring.genes) == 0
+        assert offspring is not parent
+
+    def test_asexual_reproduction_repr(self):
+        """AsexualReproduction has informative repr."""
+        reproducer = AsexualReproduction()
+        repr_str = repr(reproducer)
+        assert "AsexualReproduction" in repr_str
