@@ -10,7 +10,28 @@ Builds reduced-order models from batch results, enabling:
 Supports:
 - Polynomial response surfaces (linear, quadratic)
 - Gaussian Process (Kriging)
-- Random Forest surrogates
+
+Example
+-------
+>>> import numpy as np
+>>> import pandas as pd
+>>> from happygene.analysis.response import ResponseSurfaceModel
+>>>
+>>> # Create training data with known relationship
+>>> np.random.seed(42)
+>>> X = np.random.rand(100, 3)
+>>> y = 2*X[:,0] + 3*X[:,1] + 0.5*X[:,2] + np.random.normal(0, 0.1, 100)
+>>> df = pd.DataFrame(X, columns=['p0', 'p1', 'p2'])
+>>> df['survival'] = y
+>>>
+>>> # Fit linear response surface
+>>> model = ResponseSurfaceModel(['p0', 'p1', 'p2'], method='linear')
+>>> model.fit(df, output_col='survival')
+>>>
+>>> # Validate with cross-validation
+>>> metrics = model.cross_validate(df, output_col='survival')
+>>> print(f"R²: {metrics['r2']:.3f}")  # doctest: +SKIP
+R²: 0.950
 """
 
 import numpy as np
