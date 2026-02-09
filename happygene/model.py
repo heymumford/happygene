@@ -109,10 +109,19 @@ class GeneNetwork(SimulationModel):
             for gene_idx, gene in enumerate(individual.genes):
                 gene._expression_level = expr_matrix[ind_idx, gene_idx]
 
-        # Phase 2: Evaluate fitness
-        for individual in self.individuals:
-            fitness = self.selection_model.compute_fitness(individual)
-            individual.fitness = fitness
+        # Phase 2: Evaluate fitness (vectorized where possible)
+        # For ProportionalSelection (most common), use vectorized mean computation
+        if type(self.selection_model).__name__ == 'ProportionalSelection' and n_genes > 0:
+            # Vectorized fitness computation: mean across genes for each individual
+            # expr_matrix shape: (n_individuals, n_genes)
+            fitness_values = np.mean(expr_matrix, axis=1)  # Shape: (n_individuals,)
+            for ind_idx, individual in enumerate(self.individuals):
+                individual.fitness = fitness_values[ind_idx]
+        else:
+            # Fallback: use selection model's compute_fitness for other types or empty genes
+            for individual in self.individuals:
+                fitness = self.selection_model.compute_fitness(individual)
+                individual.fitness = fitness
 
         # Phase 3: Apply mutations
         for individual in self.individuals:
