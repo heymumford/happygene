@@ -1,0 +1,297 @@
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                         SCIENTIFIC TOOLS: FEATURE RICHNESS COMPARISON MATRIX                                          ║
+║                              HappyGene Competitive Positioning (Feb 2026)                                             ║
+╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ TIER 1: CORE SIMULATION CAPABILITIES                                                                                 │
+├───────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────────────────────────────┤
+│ Feature   │   Mesa     │  COPASI    │ BioNetGen  │  PyGAD     │  GRiNS     │  HappyGene (Target)                      │
+├───────────┼────────────┼────────────┼────────────┼────────────┼────────────┼──────────────────────────────────────────┤
+│           │            │            │            │            │            │                                          │
+│ Agents    │ ⭐⭐⭐⭐⭐ │     ⭐     │     ⭐     │    ⭐⭐    │    ⭐⭐    │ ⭐⭐⭐⭐⭐ (population simulation)      │
+│           │ Grid-based │ ODE/SSA    │ rule gen   │ GA only    │ VAEs only  │ Mix agents + GRN dynamics               │
+│           │ + network  │ chemistry  │ particles  │ abstract   │ ML backend │                                          │
+│           │            │            │            │            │            │                                          │
+│ Genes     │     ⭐     │ ⭐⭐⭐⭐⭐ │ ⭐⭐⭐⭐⭐ │     ⭐     │ ⭐⭐⭐⭐⭐ │ ⭐⭐⭐⭐⭐ (GRN + evolution)         │
+│           │ No gene    │ Biochem    │ Rule-based │ Abstract   │ JAX-based  │ Gene interaction networks              │
+│           │ network    │ networks   │ reactions  │ genes      │ expression │ + rule-based combinatorics             │
+│           │            │            │            │            │            │                                          │
+│ Evolution │    ⭐⭐    │     ⭐     │     ⭐     │ ⭐⭐⭐⭐⭐ │    ⭐⭐    │ ⭐⭐⭐⭐⭐ (selection + fitness)       │
+│           │ Custom     │ Parameter  │ Network    │ Full GA    │ Mutation   │ Multi-generational evolution           │
+│           │ agent logic│ optimiz    │ expansion  │ toolkit    │ only       │ w/ selection pressure                  │
+│           │            │            │            │            │            │                                          │
+│ Scale     │ ⭐⭐⭐⭐  │    ⭐⭐    │   ⭐⭐⭐   │   ⭐⭐⭐   │   ⭐⭐⭐   │ ⭐⭐⭐⭐⭐ (10K-1M agents)         │
+│           │ 10K agents │ 10K rxns   │ 100K rxns  │ 1K-100K   │ GPU scales │ Population-level with GRN              │
+│           │ easily     │ typical    │ typical    │ pop       │ linearly   │                                          │
+│           │            │            │            │            │            │                                          │
+└───────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ TIER 2: FLEXIBILITY & MODULARITY                                                                                     │
+├───────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────────────────────────────┤
+│ Feature   │   Mesa     │  COPASI    │ BioNetGen  │  PyGAD     │  GRiNS     │  HappyGene (Target)                      │
+├───────────┼────────────┼────────────┼────────────┼────────────┼────────────┼──────────────────────────────────────────┤
+│           │            │            │            │            │            │                                          │
+│ Scheduler │ ⭐⭐⭐⭐⭐ │     ⭐⭐    │     ⭐⭐    │     ⭐     │     ⭐     │ ⭐⭐⭐⭐⭐ (random/sequential/custom) │
+│ Customize │ Random,    │ Implicit   │ Implicit   │ No         │ No         │ Multiple scheduling modes              │
+│           │ Sequential,│ in solver  │ in solver  │ scheduling │ scheduling │ + custom schedulers                    │
+│           │ Priority   │            │            │            │            │                                          │
+│           │            │            │            │            │            │                                          │
+│ Space     │ ⭐⭐⭐⭐⭐ │     ⭐     │     ⭐     │     ⭐     │     ⭐     │ ⭐⭐⭐⭐⭐ (Grid/Continuous/Network) │
+│ Types     │ Grid,      │ Implicit   │ Rule-based │ Array-only │ No spatial │ Composable spatial representations     │
+│           │ Continuous,│ chemistry  │ chemistry  │ genes      │ agent type │                                          │
+│           │ Network,   │            │            │            │            │                                          │
+│           │ Hex        │            │            │            │            │                                          │
+│           │            │            │            │            │            │                                          │
+│ Gene      │     ⭐     │    ⭐⭐⭐   │  ⭐⭐⭐⭐  │     ⭐⭐    │ ⭐⭐⭐⭐⭐ │ ⭐⭐⭐⭐⭐ (real/binary/categorical) │
+│ Encoding  │ None       │ Chemical   │ Chemical   │ Real/binary│ VAE-based  │ Multiple gene representations           │
+│           │            │ molecules  │ rules      │ only       │ encoding   │ + custom encoding hooks                │
+│           │            │            │            │            │            │                                          │
+│ Custom    │ ⭐⭐⭐⭐⭐ │    ⭐⭐    │   ⭐⭐⭐   │ ⭐⭐⭐⭐  │   ⭐⭐⭐   │ ⭐⭐⭐⭐⭐ (extensible design)       │
+│ Hooks     │ Agent class│ Limited    │ Rule lang  │ Gene/op    │ Modular    │ Custom operators, agents, spaces      │
+│           │ extension  │ via config │ extension  │ customiz   │ layers     │                                          │
+│           │            │            │            │            │            │                                          │
+└───────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ TIER 3: PARAMETER ESTIMATION & VALIDATION                                                                            │
+├───────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────────────────────────────┤
+│ Feature   │   Mesa     │  COPASI    │ BioNetGen  │  PyGAD     │  GRiNS     │  HappyGene (Target)                      │
+├───────────┼────────────┼────────────┼────────────┼────────────┼────────────┼──────────────────────────────────────────┤
+│           │            │            │            │            │            │                                          │
+│ Parameter │    ⭐⭐    │ ⭐⭐⭐⭐⭐ │   ⭐⭐⭐   │     ⭐     │    ⭐⭐    │ ⭐⭐⭐ (scipy.optimize backend)      │
+│ Fitting   │ Manual+    │ Auto fit   │ Via        │ No fitting │ Limited    │ Grid search + differential evolution   │
+│           │ grid search│ multiple   │ BioNetFit  │ (GA is     │ (ML-based) │ + Bayesian optimization                │
+│           │            │ expts      │ tool       │ standalone)│            │                                          │
+│           │            │            │            │            │            │                                          │
+│ Sensitivity│    ⭐⭐    │ ⭐⭐⭐⭐⭐ │   ⭐⭐⭐   │     ⭐     │    ⭐⭐    │ ⭐⭐⭐ (one-at-a-time + Sobol)    │
+│ Analysis  │ Via batch  │ MCA        │ Via rules  │ None       │ Limited    │                                          │
+│           │ runs       │ + control  │ analysis   │            │ (gradient) │                                          │
+│           │            │ coeff      │            │            │            │                                          │
+│           │            │            │            │            │            │                                          │
+│ Hardy-W   │    ⭐⭐⭐   │    ⭐      │     ⭐     │     ⭐     │     ⭐     │ ⭐⭐⭐⭐⭐ (validation built-in)       │
+│ Validation│ Via tests  │ No         │ No         │ No         │ No         │ Automatic HW equilibrium test          │
+│           │ (optional) │ validation │ validation │ validation │ validation │                                          │
+│           │            │            │            │            │            │                                          │
+│ Genetic   │     ⭐     │     ⭐     │     ⭐     │    ⭐⭐    │    ⭐⭐    │ ⭐⭐⭐⭐⭐ (drift + fixation)        │
+│ Drift     │ No tools   │ No tools   │ No tools   │ No tools   │ No tools   │ Quantification + validation             │
+│ Tests     │            │            │            │            │            │                                          │
+│           │            │            │            │            │            │                                          │
+└───────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ TIER 4: ECOSYSTEM INTEGRATION (THE MULTIPLIER)                                                                       │
+├───────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────────────────────────────┤
+│ Feature   │   Mesa     │  COPASI    │ BioNetGen  │  PyGAD     │  GRiNS     │  HappyGene (Target)                      │
+├───────────┼────────────┼────────────┼────────────┼────────────┼────────────┼──────────────────────────────────────────┤
+│           │            │            │            │            │            │                                          │
+│ pandas    │ ⭐⭐⭐⭐  │    ⭐⭐    │     ⭐⭐    │  ⭐⭐⭐⭐  │     ⭐     │ ⭐⭐⭐⭐⭐ (seamless DataFrame)       │
+│ Compat    │ to_df()    │ Manual     │ Manual     │ to_df()    │ Limited    │ to_dataframe() + groupby support       │
+│           │ builtin    │ export     │ export     │ builtin    │ (numpy)    │                                          │
+│           │            │            │            │            │            │                                          │
+│ Jupyter   │ ⭐⭐⭐⭐⭐ │    ⭐⭐    │     ⭐⭐    │    ⭐⭐    │   ⭐⭐⭐   │ ⭐⭐⭐⭐⭐ (live visualization)      │
+│ Friendly  │ Solara viz │ Text UI    │ Text UI    │ Plotting   │ Jupyter    │ ipywidgets + Solara integration        │
+│           │ + widgets  │ only       │ only       │ only       │ compatible │                                          │
+│           │            │            │            │            │            │                                          │
+│ NumPy/    │ ⭐⭐⭐⭐⭐ │    ⭐⭐    │    ⭐⭐    │  ⭐⭐⭐⭐  │  ⭐⭐⭐⭐  │ ⭐⭐⭐⭐⭐ (full interop)          │
+│ SciPy     │ Native     │ Custom     │ Custom     │ Native     │ JAX native │ Arrays, optimize, stats modules        │
+│ Compat    │ arrays     │ arrays     │ output     │ arrays     │ arrays     │                                          │
+│           │            │            │            │            │            │                                          │
+│ HDF5      │    ⭐⭐    │    ⭐⭐    │     ⭐     │    ⭐⭐    │    ⭐⭐    │ ⭐⭐⭐⭐ (chunked I/O for 100K+)     │
+│ Export    │ 3rd-party  │ Limited    │ Limited    │ 3rd-party  │ Limited    │ Built-in support for large scale      │
+│           │ libs       │ (hdf5)     │ (HDF5)     │ libs       │ (HDF5)     │                                          │
+│           │            │            │            │            │            │                                          │
+│ SBML      │     ⭐     │ ⭐⭐⭐⭐⭐ │ ⭐⭐⭐⭐⭐ │     ⭐     │   ⭐⭐⭐   │ ⭐⭐⭐ (read + write GRN models) │
+│ Import    │ No         │ Full R/W   │ Full R/W   │ No         │ Partial    │                                          │
+│           │            │            │            │            │ (read)     │                                          │
+│           │            │            │            │            │            │                                          │
+│ CSV/JSON  │    ⭐⭐    │    ⭐⭐    │    ⭐⭐    │    ⭐⭐    │    ⭐⭐    │ ⭐⭐⭐⭐⭐ (native support)          │
+│ Export    │ Via pandas │ Via pandas │ Via pandas │ Via pandas │ Via numpy  │ Multiple export formats                │
+│           │            │            │            │            │            │                                          │
+│ Matplotlib│ ⭐⭐⭐⭐  │    ⭐⭐    │     ⭐     │   ⭐⭐⭐   │    ⭐⭐    │ ⭐⭐⭐⭐⭐ (publication quality)      │
+│ / Plotting│ Examples   │ Basic only │ Limited    │ Plotting   │ Limited    │ Population plots, GRN viz              │
+│           │            │            │            │            │            │                                          │
+└───────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ TIER 5: PERFORMANCE & REPRODUCIBILITY                                                                                │
+├───────────┬────────────┬────────────┬────────────┬────────────┬────────────┬──────────────────────────────────────────┤
+│ Feature   │   Mesa     │  COPASI    │ BioNetGen  │  PyGAD     │  GRiNS     │  HappyGene (Target)                      │
+├───────────┼────────────┼────────────┼────────────┼────────────┼────────────┼──────────────────────────────────────────┤
+│           │            │            │            │            │            │                                          │
+│ GPU       │     ⭐     │     ⭐     │     ⭐     │    ⭐⭐    │  ⭐⭐⭐⭐  │ ⭐⭐ (optional JAX path, Year 2)    │
+│ Support   │ No GPU     │ No GPU     │ No GPU     │ Partial    │ JAX native │                                          │
+│           │            │            │            │ (old)      │ GPU        │                                          │
+│           │            │            │            │            │            │                                          │
+│ Seed      │ ⭐⭐⭐    │   ⭐⭐⭐   │   ⭐⭐⭐   │  ⭐⭐⭐⭐  │  ⭐⭐⭐⭐  │ ⭐⭐⭐⭐⭐ (strict reproducibility)  │
+│ Control   │ Via model  │ Via solver │ Via random │ Built-in   │ JAX random │ Explicit seed propagation              │
+│           │ seed       │ seed       │ module     │ GA.seed()  │ init       │                                          │
+│           │            │            │            │            │            │                                          │
+│ Ensemble  │   ⭐⭐⭐   │    ⭐⭐    │    ⭐⭐    │    ⭐⭐    │    ⭐⭐    │ ⭐⭐⭐⭐⭐ (batch runner built-in)   │
+│ Runs      │ BatchRunner│ Limited    │ Limited    │ Limited    │ Limited    │ Parallel ensemble support              │
+│           │            │            │            │            │            │                                          │
+│ Cache/    │    ⭐⭐    │    ⭐⭐    │     ⭐     │     ⭐     │   ⭐⭐⭐   │ ⭐⭐⭐⭐ (intelligent caching)        │
+│ Lazy Eval │ Batch      │ Limited    │ No         │ No         │ Via JAX    │ JIT compilation ready                  │
+│           │ runner     │ caching    │ caching    │ caching    │ tracing    │                                          │
+│           │            │            │            │            │            │                                          │
+│ Benchmark │    ⭐⭐    │   ⭐⭐⭐   │    ⭐⭐    │     ⭐     │    ⭐⭐    │ ⭐⭐⭐⭐⭐ (validation suite)       │
+│ Suite     │ Examples   │ Test suite │ Test suite │ Test suite │ Test suite │ Hardy-Weinberg + genetic drift         │
+│           │            │ included   │ included   │ included   │ included   │ + custom validations                   │
+│           │            │            │            │            │            │                                          │
+└───────────┴────────────┴────────────┴────────────┴────────────┴────────────┴──────────────────────────────────────────┘
+
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                     HAPPYGENE'S UNIQUE POSITIONING                                                   ║
+╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ THE COMBINATION THAT DOESN'T EXIST YET:                                                                              │
+│                                                                                                                       │
+│  Mesa (Agents) + COPASI (Genes) + PyGAD (Evolution) + Validation Suite                                             │
+│                                                                                                                       │
+│  NO competitor combines:                                                                                             │
+│   ✗ Agent-based modeling at population scale                                                                        │
+│   ✗ Gene regulatory networks with realistic dynamics                                                                │
+│   ✗ Evolutionary algorithms with selection feedback                                                                 │
+│   ✗ All three simultaneously (agents↔genes↔evolution feedback loop)                                                 │
+│   ✗ Population genetics validation built-in                                                                          │
+│                                                                                                                       │
+│  HappyGene = THE FIRST TOOL to integrate all five dimensions                                                        │
+│                                                                                                                       │
+└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ FEATURE GAPS HAPPYGENE CAN UNIQUELY FILL:                                                                            │
+├───────────────────────────────┬──────────────────────────────────────────────────────────────────────────────────────┤
+│ Gap / Problem                 │ Why It Exists + HappyGene Solution                                                  │
+├───────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ No integrated population      │ Mesa = agents (no genes)                                                             │
+│ genetics simulator            │ COPASI = genes (no agents)                                                           │
+│                               │ PyGAD = evolution (no populations)                                                   │
+│                               │                                                                                      │
+│ HAPPYGENE: Combines all three │                                                                                      │
+├───────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ Can't model gene networks     │ Mesa has no GRN models                                                               │
+│ at population scale           │ GRiNS is JAX-only, not agent-based                                                   │
+│ with evolution                │ BioNetGen is biochemical, not population-level                                       │
+│                               │                                                                                      │
+│ HAPPYGENE: GRN + agents + GA  │                                                                                      │
+├───────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ No population genetics        │ COPASI validates biochemistry, not genetics                                          │
+│ validation suite              │ BioNetGen validates biochemistry, not genetics                                       │
+│ (Hardy-Weinberg, drift)       │ Mesa examples don't include genetics tests                                           │
+│                               │                                                                                      │
+│ HAPPYGENE: Built-in HW + drift│                                                                                      │
+├───────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ Can't do interactive          │ COPASI = desktop UI (not Jupyter-friendly)                                           │
+│ evolutionary analysis in      │ BioNetGen = text-based (not interactive)                                             │
+│ Jupyter notebooks             │ Mesa = can, but no gene module                                                       │
+│                               │                                                                                      │
+│ HAPPYGENE: Full Jupyter + IPA │                                                                                      │
+├───────────────────────────────┼──────────────────────────────────────────────────────────────────────────────────────┤
+│ No seamless DataFrame export  │ COPASI = custom format (convert manually)                                            │
+│ for population-scale sims     │ BioNetGen = custom format (convert manually)                                         │
+│ + evolution tracking          │ GRiNS = NumPy arrays (not DataFrames)                                                │
+│                               │                                                                                      │
+│ HAPPYGENE: to_dataframe() +   │                                                                                      │
+│ full pandas interop           │                                                                                      │
+└───────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────┘
+
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                    IMPLEMENTATION PRIORITY MATRIX                                                    ║
+║                         What to build first to match researcher expectations                                         ║
+╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+PHASE 1 (Weeks 1-10): FOUNDATION - MUST HAVE
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                                                        │
+│  ✓ Modular space types (Grid, Continuous, Network graph)                                                             │
+│  ✓ Customizable schedulers (Random, Sequential, custom)                                                              │
+│  ✓ Genetic operators (crossover, mutation, selection + hooks)                                                        │
+│  ✓ Gene encoding (real-valued, binary, categorical)                                                                  │
+│  ✓ Agent-gene coupling (GRN + genome per agent)                                                                      │
+│  ✓ Population scale simulation (10K-100K agents)                                                                      │
+│  □ pandas DataFrame export (to_dataframe method)                                                                      │
+│  □ CSV/JSON export                                                                                                    │
+│  □ Seed control for reproducibility                                                                                  │
+│  □ ≥80% test coverage + Hardy-Weinberg validation                                                                    │
+│                                                                                                                        │
+│  Effort: ~200 hours                                                                                                   │
+│  Outcome: 35-40 point maturity score (Tier 1-2)                                                                       │
+│                                                                                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+PHASE 2 (Months 3-6): STABILITY - SHOULD HAVE
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                                                        │
+│  □ SBML import (read standard gene network models)                                                                    │
+│  □ HDF5 export (large population I/O)                                                                                │
+│  □ Parameter fitting (grid search + scipy.optimize)                                                                  │
+│  □ Sensitivity analysis (one-at-a-time + Sobol')                                                                     │
+│  □ Jupyter/ipywidgets integration (interactive sliders)                                                               │
+│  □ matplotlib visualization (population, GRN, fitness landscape)                                                     │
+│  □ Documentation (API + 5 realistic notebooks)                                                                        │
+│  □ Genetic drift validation tests                                                                                     │
+│                                                                                                                        │
+│  Effort: ~300 hours                                                                                                   │
+│  Outcome: 65-75 point maturity score (Tier 3-4)                                                                       │
+│                                                                                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+PHASE 3 (Months 7-12): ECOSYSTEM - NICE TO HAVE
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                                                        │
+│  □ JAX backend (optional GPU acceleration)                                                                            │
+│  □ JOSS paper submission + peer review                                                                                │
+│  □ Bioconda packaging                                                                                                 │
+│  □ Community examples (10+ workflows)                                                                                 │
+│  □ Citation + reproducibility tracking                                                                                │
+│  □ Governance + contribution guidelines                                                                               │
+│  □ Rule-based network definition (BioNetGen-like)                                                                     │
+│                                                                                                                        │
+│  Effort: ~250 hours                                                                                                   │
+│  Outcome: 85-95 point maturity score (Tier 4-5)                                                                       │
+│                                                                                                                        │
+└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                         KEY METRICS TO TRACK                                                         ║
+║                    Quarterly health check for ecosystem maturity                                                      ║
+╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────┬────────────────┬────────────────┬────────────────┬──────────────────────────────────────────────┐
+│ Metric           │  Green ✓       │  Yellow ?      │  Red ✗         │  Why This Matters                            │
+├──────────────────┼────────────────┼────────────────┼────────────────┼──────────────────────────────────────────────┤
+│ Test Coverage    │ ≥85%           │ 70-85%         │ <70%           │ Researchers don't trust untested code       │
+│ Commits/Month    │ ≥10            │ 5-10           │ <5             │ Indicates active development                │
+│ PR Review Time   │ <30 days       │ 30-90 days     │ >90 days       │ Community health indicator                  │
+│ Contributors     │ ≥5             │ 2-4            │ 1              │ Bus factor + sustainability                 │
+│ Documentation    │ Complete+Ex    │ Partial        │ Minimal        │ Adoption = documentation quality            │
+│ Validation Tests │ ≥10 scientific │ 5-10           │ <5             │ Trust in results                             │
+│ Downloads/Month  │ >1,000         │ 100-1,000      │ <100           │ Adoption rate                               │
+│ Citations        │ Growing 50+/yr │ Growing <50/yr │ Flat/decline   │ Research impact                              │
+│ Issue Resolution │ ≥80% closed    │ 60-80%         │ <60%           │ Maintainability                              │
+└──────────────────┴────────────────┴────────────────┴────────────────┴──────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+
+LEGEND:
+⭐ = Strong support for feature
+⭐⭐ = Good support
+⭐⭐⭐ = Excellent support
+⭐⭐⭐⭐ = Very strong implementation
+⭐⭐⭐⭐⭐ = Best-in-class; exemplary implementation
+
+SOURCES:
+→ Mesa Documentation: https://mesa.readthedocs.io/
+→ COPASI Features: https://copasi.org/Support/Features/
+→ BioNetGen Rules: https://github.com/RuleWorld/bionetgen
+→ PyGAD Library: https://pygad.readthedocs.io/
+→ Scientific Python Ecosystem: https://scipy-lectures.org/intro/intro.html
+→ JAX GPU Benchmarks: https://figshare.com/articles/figure/Jax_vs_PyTorch_vs_Julia_GPU_Benchmarks/24586980
+→ HDF5/Zarr Comparison: https://medium.com/pangeo/cloud-performant-reading-of-netcdf4-hdf5-data-using-the-zarr-library
+
+DOCUMENT STATUS: Complete feature analysis + prioritization matrix
+NEXT STEP: Map features against existing codebase + identify Phase 1 gaps
+═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════

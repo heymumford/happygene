@@ -1,0 +1,190 @@
+HappyGene Pre-Commit Quality Checklist
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Before EVERY commit, verify:
+
+TESTS (MUST PASS):
+  ☐ Run: pytest tests/
+  ☐ All tests green (no failures)
+  ☐ No regressions from previous run
+  ☐ New feature has corresponding test in tests/ directory
+
+  Command:
+    pytest tests/ -v
+
+CODE QUALITY (AUTOMATED):
+  ☐ No __pycache__/ in staging area
+  ☐ No .coverage files in staging area
+  ☐ No .pytest_cache/ in staging area
+  ☐ No IDE-specific files (.vscode/, .idea/, *.swp)
+
+  Command to check:
+    git status --short
+
+  If issues found, run:
+    git reset <problematic-file>
+    rm -rf __pycache__ .pytest_cache .coverage
+
+DOCUMENTATION:
+  ☐ Docstrings added for new classes/functions
+  ☐ README.md updated if user-facing change
+  ☐ Type hints added for function parameters
+
+CODE STYLE (OPTIONAL BUT ENCOURAGED):
+  ☐ Code follows 100-character line length limit
+  ☐ Variable names are descriptive (not a, b, c)
+  ☐ Comments explain WHY, not WHAT
+
+  Commands:
+    black --check happygene/
+    ruff check happygene/
+
+  Auto-fix:
+    black happygene/
+    ruff check --fix happygene/
+
+COMMIT MESSAGE:
+  ☐ Message starts with type: feat|fix|refactor|test|docs|ci|chore
+  ☐ Subject line is descriptive (≥10 characters, <72 characters)
+  ☐ Body explains WHAT and WHY (if complex change)
+  ☐ Footer references issue number if applicable (Closes: #123)
+
+  Format:
+    <type>: <subject>
+
+    <optional body>
+
+    Closes: #<issue-number>
+
+  Example:
+    feat: add Hill cooperative binding expression model
+
+    Implements Hill equation for transcription factor binding
+    with configurable cooperativity parameter. Allows modeling
+    of multi-site regulatory interactions.
+
+    Closes: #5
+
+GIT STATUS:
+  ☐ Branch name follows convention: feature/TICKET-ID-description
+  ☐ Not committing to main (always use feature branch)
+  ☐ Commits are logical and minimal (one change per commit)
+
+  Check:
+    git status
+    git branch
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Before EVERY push:
+
+FINAL VERIFICATION:
+  ☐ Tests still pass: pytest tests/
+  ☐ Pushing to feature branch, NOT main
+  ☐ Branch is up to date with main: git pull origin main
+  ☐ Commits are clean: git log --oneline -5
+
+  Command:
+    git log --oneline -5  # Verify clean history
+
+GIT WORKFLOW:
+  ☐ Push to feature branch: git push origin feature/your-branch
+  ☐ Create/update PR on GitHub if not already created
+  ☐ Never merge without approval (let maintainer merge)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+QUICK COMMANDS REFERENCE:
+
+# Run all checks
+pytest tests/ && black --check happygene/ && ruff check happygene/
+
+# See what's staged
+git status --short
+
+# Unstage accidentally committed files
+git reset <filename>
+
+# Check git log
+git log --oneline -10
+
+# View changes before committing
+git diff --cached
+
+# Reset to last commit (if you made mistakes)
+git reset --hard HEAD
+
+═══════════════════════════════════════════════════════════════════════════════
+
+COMMON MISTAKES TO AVOID:
+
+❌ Committing __pycache__/
+   → Run: git reset && rm -rf __pycache__
+
+❌ Committing .coverage or htmlcov/
+   → Check .gitignore is present
+   → Run: git reset && rm -rf .coverage htmlcov/
+
+❌ Tests failing but committing anyway
+   → Tests are your safety net. Fix them first.
+   → Run: pytest tests/ -v --tb=short
+
+❌ Committing to main branch
+   → Always use feature branches
+   → Run: git checkout -b feature/your-feature
+
+❌ Generic commit message like "fix" or "update"
+   → Use format: feat|fix|refactor: descriptive message
+   → Example: "feat: add Hill expression model"
+
+❌ Large commits with multiple unrelated changes
+   → Break into smaller commits (one change per commit)
+   → Each commit should be reviewable independently
+
+═══════════════════════════════════════════════════════════════════════════════
+
+BRANCH NAMING CONVENTION:
+
+Format: <type>/<TICKET>-<description>
+
+Types:
+  feature/    → New feature
+  fix/        → Bug fix
+  refactor/   → Code restructuring
+  docs/       → Documentation
+  test/       → Testing
+
+Examples:
+  ✓ feature/HG-5-hill-expression
+  ✓ fix/HG-12-mutation-probability
+  ✓ docs/HG-8-api-documentation
+  ✓ test/HG-15-expression-edge-cases
+
+Wrong:
+  ❌ my-feature
+  ❌ stuff
+  ❌ update
+
+═══════════════════════════════════════════════════════════════════════════════
+
+HELPFUL LINKS:
+
+- How to write good commit messages:
+  https://chris.beams.io/posts/git-commit/
+
+- pytest documentation:
+  https://docs.pytest.org/
+
+- Python style guide (PEP 8):
+  https://www.python.org/dev/peps/pep-0008/
+
+- HappyGene Contributing Guide:
+  See CONTRIBUTING.md
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Questions? Open a Discussion:
+  https://github.com/yourusername/happygene/discussions
+
+Last updated: February 2025
