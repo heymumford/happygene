@@ -49,10 +49,9 @@ output_path = export_to_sbml(config, damage_profile, "model.xml")
 
 ## Documentation
 
-- [API Documentation](https://heymumford.github.io/happygene) — Full reference
-- [Contributing Guide](CONTRIBUTING.md) — How to contribute
-- [Changelog](CHANGELOG.md) — Version history
-- [SBML Export/Import](docs/sbml.md) — Cross-tool validation
+- [📖 Full Documentation](https://heymumford.github.io/happygene) — Getting started, tutorials, API reference, and examples
+- [🔧 Contributing Guide](CONTRIBUTING.md) — How to contribute
+- [📝 Changelog](CHANGELOG.md) — Version history
 
 ## Features
 
@@ -119,7 +118,7 @@ If you use Happy Gene in research, please cite:
 
 ## Status
 
-- **Latest Version**: 0.1.0-dev
-- **Test Coverage**: 77% (target: 75%)
-- **Tests Passing**: 97/97 ✓
+- **Latest Version**: 0.1.0
+- **Test Coverage**: 80.54% (target: 75%)
+- **Tests Passing**: 153/153 ✓
 - **CI/CD**: GitHub Actions (pytest + type checking)

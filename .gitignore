@@ -49,3 +49,6 @@ htmlcov/
 *.hdf5
 .env
 .worktrees/
+
+# Documentation
+site/

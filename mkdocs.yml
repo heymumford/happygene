@@ -1,0 +1,41 @@
+site_name: HappyGene Documentation
+site_description: Multi-scale DNA Repair Simulation Engine
+site_author: Eric C. Mumford
+site_url: https://heymumford.github.io/happygene
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: blue
+    accent: blue
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - User Guide: user-guide.md
+  - API Reference: api-reference.md
+  - Examples: examples/index.md
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - admonition
+  - codehilite
+  - toc
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/heymumford/happygene
+  version: 0.1.0
