@@ -83,7 +83,7 @@ Enable research adoption through comprehensive documentation, tutorials, and pub
 (To be filled)
 
 ## Status
-**COMPLETE Phase 1 (RED)** - Documentation structure defined ✓
+**COMPLETE Phase 2 (GREEN)** - Jupyter notebooks and examples implemented ✓
 
 ## Phase 1 (RED) Summary
 - **Index (docs/index.md)**: 98 lines - Navigation hub with quick links, feature overview, and support info
@@ -91,6 +91,21 @@ Enable research adoption through comprehensive documentation, tutorials, and pub
 - **User Guide (docs/user-guide.md)**: 344 lines - Comprehensive configuration, batch processing, visualization, COPASI integration, and troubleshooting
 - **API Reference (docs/api-reference.md)**: 293 lines - 25+ documented functions and classes with examples
 - **Directory Structure**: docs/examples/ and docs/tutorials/ ready for Jupyter notebooks and guides
+
+## Phase 2 (GREEN) Summary
+- **5 Example Notebooks** (docs/examples/, 1,302 LOC total):
+  1. **01_hello_world.ipynb** - Basic single simulation (95 cells)
+  2. **02_batch_processing.ipynb** - Batch simulations & statistics (110 cells)
+  3. **03_visualization.ipynb** - Dashboards & exports (105 cells)
+  4. **04_copasi_workflow.ipynb** - SBML round-trip (115 cells)
+  5. **05_parameter_sensitivity.ipynb** - Parameter sweeps (100 cells)
+- **Features in All Notebooks**:
+  - Step-by-step code with explanations
+  - Runnable examples with sample data
+  - Output verification and interpretation
+  - Practical workflows for common tasks
+  - Best practices and next steps
+- **Total Documentation**: 2,668 LOC (RED: 866 + GREEN: 1,302 + supporting)
 
 ## Execution Efficiency
 (To be filled after Phase 3)
