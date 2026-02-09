@@ -1,0 +1,30 @@
+name: Validate PR Title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  validate-title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate conventional commit format
+        uses: amannn/action-semantic-pull-request@v5
+        with:
+          types: |
+            feat
+            fix
+            docs
+            test
+            refactor
+            perf
+            ci
+            style
+            build
+          requireScope: false
+          subjectPattern: ^(?!.*\.$).{1,100}$
+          subjectPatternError: |
+            The PR title is too long (max 100 chars) or ends with a period.
+            Expected format: "type(scope): description"
+            Example: "feat(io): Add SBML export validation"
+          validateSingleCommit: false
