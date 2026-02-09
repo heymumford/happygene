@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "happygene"
-version = "0.1.0"
-description = "Framework for simulating gene network evolution with selection, mutation, and expression dynamics"
+version = "0.2.0"
+description = "Framework for simulating gene network evolution with regulatory networks, selection, mutation, and expression dynamics"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.12"
@@ -24,6 +24,8 @@ classifiers = [
 dependencies = [
     "numpy>=1.26",
     "pandas>=2.0",
+    "scipy>=1.10",
+    "networkx>=3.0",
 ]
 
 [project.optional-dependencies]

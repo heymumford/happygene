@@ -1,5 +1,6 @@
 """Tests for Gene and Individual entities."""
-
+import sys
+import pytest
 from happygene.entities import Gene, Individual
 
 
@@ -71,3 +72,49 @@ class TestIndividual:
         genes = [Gene("A", 2.0), Gene("B", 8.0), Gene("C", 10.0)]
         ind = Individual(genes=genes)
         assert ind.mean_expression() == 20.0 / 3.0
+
+
+class TestMemoryOptimization:
+    """Tests for memory usage before and after __slots__ optimization."""
+
+    def test_gene_object_size_baseline(self):
+        """Gene object baseline size can be measured."""
+        gene = Gene("TEST", 1.5)
+        size = sys.getsizeof(gene)
+        # Before __slots__: typically ~300-400+ bytes depending on Python version
+        # Just verify we can measure it and it's reasonable
+        assert size > 0
+        assert size < 1000  # Should be under 1KB
+
+    def test_individual_object_size_baseline(self):
+        """Individual object baseline size can be measured."""
+        genes = [Gene(f"G{i}", float(i)) for i in range(100)]
+        ind = Individual(genes=genes)
+        size = sys.getsizeof(ind)
+        # Before __slots__: typically several KB
+        assert size > 0
+        assert size < 100000  # Should be under 100KB per individual
+
+    def test_gene_slots_defined(self):
+        """Gene class has __slots__ defined."""
+        assert hasattr(Gene, '__slots__')
+        assert 'name' in Gene.__slots__
+        assert '_expression_level' in Gene.__slots__
+
+    def test_gene_no_dict_after_slots(self):
+        """Gene instances do not have __dict__ after __slots__ optimization."""
+        gene = Gene("TEST", 1.5)
+        # With __slots__, instances should not have __dict__
+        assert not hasattr(gene, '__dict__')
+
+    def test_individual_slots_defined(self):
+        """Individual class has __slots__ defined."""
+        assert hasattr(Individual, '__slots__')
+        assert 'genes' in Individual.__slots__
+        assert 'fitness' in Individual.__slots__
+
+    def test_individual_no_dict_after_slots(self):
+        """Individual instances do not have __dict__ after __slots__ optimization."""
+        ind = Individual(genes=[])
+        # With __slots__, instances should not have __dict__
+        assert not hasattr(ind, '__dict__')

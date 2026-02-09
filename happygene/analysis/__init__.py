@@ -33,10 +33,7 @@ Modules
 """
 
 from .batch import BatchSimulator
-from .correlation import CorrelationAnalyzer
 from .morris import MorrisAnalyzer, MorrisIndices
-from .output import OutputExporter
-from .response import ResponseSurfaceModel
 from .sobol import SobolAnalyzer, SobolIndices
 
 __all__ = [
