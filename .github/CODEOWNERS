@@ -1,0 +1,152 @@
+# CODEOWNERS — happygene v0.2.0 (Tier-based routing)
+#
+# Format: <path> <@github-username> [<@github-username2> ...]
+#
+# Tier classification drives review requirements:
+# - Tier 1 (CRITICAL): Requires 1 reviewer (DATA-MODEL-LEAD)
+# - Tier 2 (COMPUTATION): 0-1 reviewers; auto-merge if coverage ≥90%
+# - Tier 3 (UTILITY): Auto-merge if CI passes (no mandatory reviewers)
+# - Tier 4 (LEGACY): Auto-merge if CI passes
+#
+# Reference: TIER_CLASSIFICATION.md (detailed module breakdown)
+#            FINAL_SYNTHESIS_Iteration_5_UnifiedWorkflow.md § Code Review Tiers
+#
+# Pattern matching: Most-specific rules last (CODEOWNERS processes in reverse order)
+
+# ============================================================================
+# TIER 1: CRITICAL — Requires 1 Reviewer
+# ============================================================================
+# Rationale: Core entities, orchestration, persistence break simulation if wrong
+
+# Core Data Entities
+happygene/entities.py @vorthruna
+happygene/base.py @vorthruna
+
+# Main Orchestration
+happygene/model.py @vorthruna
+
+# Persistence & Configuration
+happygene/datacollector.py @vorthruna
+happygene/conditions.py @vorthruna
+
+# Test Infrastructure (tests ARE the quality gate)
+tests/test_model.py @vorthruna
+tests/test_theory.py @vorthruna
+tests/test_entities.py @vorthruna
+tests/test_datacollector.py @vorthruna
+tests/test_base.py @vorthruna
+tests/conftest.py @vorthruna
+
+# ============================================================================
+# TIER 2: COMPUTATION — 0-1 Reviewers (Auto-merge if coverage ≥90%)
+# ============================================================================
+# Rationale: Algorithms matter; fallback available; testable behavior
+
+# Expression Models
+happygene/expression.py @vorthruna
+happygene/regulatory_expression.py @vorthruna
+
+# Selection Models (Fitness & Reproduction)
+happygene/selection.py @vorthruna
+
+# Mutation Models
+happygene/mutation.py @vorthruna
+
+# Analysis Tools (Post-simulation; output verification)
+happygene/analysis/ @vorthruna
+
+# Regulatory Network (Exploratory; fallback = no regulation)
+happygene/regulatory_network.py @vorthruna
+
+# Corresponding Tests (Tier 2 modules)
+tests/test_expression.py @vorthruna
+tests/test_regulatory_expression.py @vorthruna
+tests/test_selection.py @vorthruna
+tests/test_mutation.py @vorthruna
+tests/test_regulatory_network.py @vorthruna
+tests/analysis/ @vorthruna
+
+# ============================================================================
+# TIER 3: UTILITY — Auto-merge if CI passes
+# ============================================================================
+# Rationale: Examples, helpers, CLI, viz are nice-to-have; clarity > completeness
+
+# Package Metadata
+happygene/__init__.py
+
+# Example Scripts (if in happygene/examples/)
+# (Not currently present; will add when examples move to package)
+
+# CLI Tools (if created)
+# happygene/cli.py
+
+# Visualization (if created)
+# happygene/viz.py
+
+# Example Tests
+tests/test_examples.py
+
+# ============================================================================
+# TIER 4: LEGACY — Auto-merge if CI passes
+# ============================================================================
+# Rationale: Deprecated, unused, or candidates for removal
+
+# (None identified in v0.2.0)
+# deprecated/
+
+# ============================================================================
+# DEFAULT — All other files (docs, config, etc.)
+# ============================================================================
+
+# Documentation
+*.md @vorthruna
+
+# Configuration
+pyproject.toml @vorthruna
+Makefile @vorthruna
+setup.py @vorthruna
+setup.cfg @vorthruna
+
+# CI/CD
+.github/workflows/ @vorthruna
+.github/CODEOWNERS @vorthruna
+
+# Development
+.pre-commit-config.yaml @vorthruna
+.gitignore @vorthruna
+
+# Root
+LICENSE @vorthruna
+README.md @vorthruna
+CHANGELOG.md @vorthruna
+
+# ============================================================================
+# NOTES FOR REVIEWERS
+# ============================================================================
+#
+# Tier 1 (CRITICAL) Changes:
+# - Always required: 1 review approval
+# - Checklist: TDD followed, coverage 100%, no breaking changes
+# - Examples: entities, model, base, tests, datacollector
+#
+# Tier 2 (COMPUTATION) Changes:
+# - Optional review; auto-merge if:
+#   - CI passes (lint, type, tests all green)
+#   - Coverage ≥90% (per scripts/check_coverage_by_tier.py)
+# - Consider requesting review if:
+#   - Algorithm change (expression, selection, mutation models)
+#   - New parameter (potential impact on existing simulations)
+#   - Large refactoring
+# - Examples: expression.py, selection.py, analysis/
+#
+# Tier 3 (UTILITY) Changes:
+# - Auto-merge if CI passes
+# - No mandatory review
+# - Request review for:
+#   - Documentation changes (clarity/accuracy)
+#   - Significant additions (new examples)
+#
+# Rule: When in doubt, request review. Better to have eyes on code than not.
+#
+# Questions? See TIER_CLASSIFICATION.md for detailed rationale.
+#
