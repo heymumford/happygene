@@ -1,7 +1,17 @@
 """
-Output File Handling - GREEN Phase Implementation
+Result Output Formatting
 
-Saves simulation results in various formats (HDF5, JSON, CSV).
+Saves simulation results to disk in multiple formats with automatic
+parent directory creation and format detection.
+
+Supported Formats:
+- HDF5 (.h5): Binary format with compression for large datasets
+- JSON (.json): Human-readable format for interoperability
+- CSV (.csv): Spreadsheet format for Excel compatibility
+
+Examples:
+    >>> writer = OutputWriter(OutputFormat.HDF5)
+    >>> writer.write(results, Path("output.h5"))
 """
 
 import csv

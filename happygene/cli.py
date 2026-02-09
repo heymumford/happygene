@@ -1,7 +1,19 @@
 """
-CLI Entry Point - GREEN Phase Implementation
+Command-Line Interface
 
-Command-line interface for running simulations.
+Main entry point for HappyGene simulation runner.
+
+Provides CLI commands for running single and batch simulations with
+configuration files in YAML or JSON format.
+
+Commands:
+    simulate: Run a single simulation
+    batch: Run multiple independent simulations
+
+Examples:
+    $ happygene --version
+    $ happygene simulate --config config.yaml
+    $ happygene batch --config config.yaml --num-runs 100 --output results.h5
 """
 
 from pathlib import Path

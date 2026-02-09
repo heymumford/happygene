@@ -1,7 +1,18 @@
 """
-Batch Simulator - GREEN Phase Implementation
+Batch Simulation Runner
 
-Runs multiple simulations with same configuration and aggregates results.
+Executes multiple independent simulations with the same configuration
+and aggregates results with statistical analysis.
+
+The batch simulator provides parallel execution capability for conducting
+parameter sensitivity studies and Monte Carlo uncertainty quantification.
+
+Examples:
+    >>> config = HappyGeneConfig(...)
+    >>> damage = DamageProfile(...)
+    >>> sim = BatchSimulator(config, damage)
+    >>> results = sim.run_batch(num_runs=100)
+    >>> stats = sim.compute_statistics(results)
 """
 
 import time

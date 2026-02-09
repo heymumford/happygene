@@ -1,7 +1,15 @@
 """
-Configuration Loaders - GREEN Phase Implementation
+Configuration File Loaders
 
-Loads HappyGeneConfig from YAML or JSON files with validation.
+Loads HappyGeneConfig from YAML or JSON configuration files with validation.
+
+Supported Formats:
+- YAML (.yaml, .yml): Human-readable configuration
+- JSON (.json): Machine-readable configuration
+
+Examples:
+    >>> config = load_config_from_file("config.yaml")
+    >>> kinetics = config.kinetics
 """
 
 import json
