@@ -192,3 +192,72 @@ def cache_dir(tmp_path):
 def tmp_data_dir(tmp_path):
     """Temporary directory for test data files."""
     return tmp_path / 'data'
+
+
+@pytest.fixture
+def sobol_batch_results(param_names):
+    """Batch results sized for Sobol analysis (Saltelli-structured).
+
+    Saltelli (Sobol extended) scheme requires N*(2D+2) rows where D=num_params.
+    For 5 params with N=64: 64*(2*5+2) = 768 rows.
+    Uses known sensitivity structure for testing.
+    """
+    from SALib.sample import saltelli
+
+    problem = {
+        'num_vars': len(param_names),
+        'names': param_names,
+        'bounds': [(0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.1, 10.0)],
+    }
+    X = saltelli.sample(problem, 64, calc_second_order=True)
+
+    # Known sensitivity structure for testing
+    np.random.seed(42)
+    Y = (0.5 * X[:, 0] + 0.3 * X[:, 1] + 0.1 * X[:, 2] + 0.05 * X[:, 3] + 0.02 * X[:, 4]
+         + np.random.normal(0, 0.01, len(X)))
+
+    df = pd.DataFrame(X, columns=param_names)
+    df['survival'] = Y
+    df['total_repairs'] = np.random.randint(50, 500, len(X))
+    df['repair_time'] = np.random.uniform(1.0, 100.0, len(X))
+    df['run_id'] = [f'run_{i:05d}' for i in range(len(X))]
+    df['seed'] = [42 + i for i in range(len(X))]
+
+    return df
+
+
+@pytest.fixture
+def morris_batch_results(param_names):
+    """Batch results sized for Morris analysis (Morris-structured).
+
+    Morris sampling requires N*(D+1) rows where D=num_params and N=num_trajectories.
+    For 5 params with N=20: 20*(5+1) = 120 rows.
+    Uses known sensitivity structure for testing.
+    """
+    from SALib.sample import morris as morris_sample
+
+    problem = {
+        'num_vars': len(param_names),
+        'names': param_names,
+        'bounds': [(0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.1, 10.0)],
+    }
+    X = morris_sample.sample(problem, N=20, num_levels=10)
+
+    np.random.seed(42)
+    Y = (0.7 * X[:, 0] + 0.3 * X[:, 1] + 0.05 * X[:, 2]
+         + np.random.normal(0, 0.01, len(X)))
+
+    df = pd.DataFrame(X, columns=param_names)
+    df['survival'] = Y
+    df['total_repairs'] = np.random.randint(50, 500, len(X))
+    df['repair_time'] = np.random.uniform(1.0, 100.0, len(X))
+    df['run_id'] = [f'run_{i:05d}' for i in range(len(X))]
+    df['seed'] = [42 + i for i in range(len(X))]
+
+    return df
+
+
+@pytest.fixture
+def output_dir(tmp_path):
+    """Temporary directory for OutputExporter tests."""
+    return tmp_path / 'output'
