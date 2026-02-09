@@ -37,7 +37,7 @@ class ResponseSurfaceModel:
         self.param_names = param_names
         self.n_params = len(param_names)
         self.method = method
-        self.scaler = StandardScaler()
+        self.scaler = None  # Initialized in fit() after sklearn import
         self.model = None
         self.is_fitted = False
 
