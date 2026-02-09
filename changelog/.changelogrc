@@ -1,0 +1,57 @@
+# HappyGene Changelog Configuration
+
+schema_version: 1.0
+unreleased_section: true
+
+sections:
+  - Added
+  - Changed
+  - Fixed
+  - Removed
+  - Deprecated
+  - Security
+
+date_format: "YYYY-MM-DD"
+grouping: "version"  # Options: version, date
+
+types:
+  - feat      # Feature additions
+  - fix       # Bug fixes
+  - docs      # Documentation
+  - refactor  # Code refactoring (no behavior change)
+  - perf      # Performance improvements
+  - test      # Test additions/modifications
+  - ci        # CI/CD changes
+  - chore     # Maintenance (dependency updates, housekeeping)
+
+# GitHub/GitLab integration (optional)
+github_repo: "heymumford/happygene"
+github_token_env: "GITHUB_TOKEN"
+
+# Validation rules
+validation:
+  require_type: true           # All commits must have a type prefix
+  require_scope: false         # Optional: feat(scope): description
+  require_ticket: false        # Optional: feat: TICKET-123 description
+  max_line_length: 100
+
+# Auto-generation from git
+git_integration:
+  enabled: true
+  conventional_commits: true   # Follows conventional commits standard
+  skip_merge_commits: true
+  group_by_type: true
+
+# Paths to include/exclude
+include_paths:
+  - "engine/"
+  - "cli/"
+  - "mcp/"
+  - "macos/"
+  - "knowledge_graph/"
+
+exclude_paths:
+  - "docs/"
+  - "changelog/"
+  - ".github/"
+  - "docker/"
