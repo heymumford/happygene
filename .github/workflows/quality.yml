@@ -61,7 +61,7 @@ jobs:
 
       # Reporting: Upload coverage
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage.json
           flags: python-${{ matrix.python-version }}
@@ -71,7 +71,7 @@ jobs:
       # Reporting: Store coverage HTML
       - name: Upload coverage HTML artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report-py${{ matrix.python-version }}
           path: htmlcov/
@@ -80,7 +80,7 @@ jobs:
       # Reporting: Store security report
       - name: Upload security report artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bandit-report
           path: bandit-report.json
