@@ -80,8 +80,13 @@ docs = [
     "mkdocstrings>=0.24",
 ]
 
+io = [
+    "python-libsbml>=5.20",
+    "lxml>=4.9",
+]
+
 all = [
-    "happygene[dev,mcp,ui,science,docs]"
+    "happygene[dev,mcp,ui,science,docs,io]"
 ]
 
 [project.urls]
