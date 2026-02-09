@@ -23,11 +23,11 @@ from engine.simulator.batch import BatchSimulator as HappyGeneBatchSimulator
 def param_space():
     """Standard parameter space for DNA repair sensitivity analysis."""
     return {
-        'recognition_rate': (0.01, 0.99),
-        'repair_rate': (0.01, 0.99),
-        'misrepair_rate': (0.01, 0.99),
-        'recovery_rate': (0.01, 0.99),
-        'dose_gy': (0.1, 10.0),
+        "recognition_rate": (0.01, 0.99),
+        "repair_rate": (0.01, 0.99),
+        "misrepair_rate": (0.01, 0.99),
+        "recovery_rate": (0.01, 0.99),
+        "dose_gy": (0.1, 10.0),
     }
 
 
@@ -38,6 +38,7 @@ def sim_factory():
     Returns a callable that creates a HappyGeneConfig from parameter dict.
     For testing, returns a mock that stores parameters without full initialization.
     """
+
     def create_model(params):
         """Create HappyGeneConfig from parameter dictionary.
 
@@ -55,10 +56,10 @@ def sim_factory():
         """
         # Create kinetics config
         kinetics = KineticsConfig(
-            recognition_rate=params.get('recognition_rate', 0.1),
-            repair_rate=params.get('repair_rate', 0.05),
-            misrepair_rate=params.get('misrepair_rate', 0.01),
-            recovery_rate=params.get('recovery_rate', 0.02)
+            recognition_rate=params.get("recognition_rate", 0.1),
+            repair_rate=params.get("repair_rate", 0.05),
+            misrepair_rate=params.get("misrepair_rate", 0.01),
+            recovery_rate=params.get("recovery_rate", 0.02),
         )
 
         # Create a minimal config (for testing batch interface, not simulation)
@@ -72,13 +73,11 @@ def sim_factory():
 
         # Separate dose_gy from other params to avoid duplicate keyword arg
         # Note: Don't modify original params dict as it's used downstream
-        dose_gy_val = params.get('dose_gy', 3.0)
-        other_params = {k: v for k, v in params.items() if k != 'dose_gy'}
+        dose_gy_val = params.get("dose_gy", 3.0)
+        other_params = {k: v for k, v in params.items() if k != "dose_gy"}
 
         config = MockConfig(
-            dose_gy=dose_gy_val,
-            kinetics=kinetics,
-            other_params=other_params
+            dose_gy=dose_gy_val, kinetics=kinetics, other_params=other_params
         )
         return config
 
@@ -126,11 +125,11 @@ def batch_results_df(param_names, normalized_samples):
 
     # Denormalize parameters
     param_space = {
-        'recognition_rate': (0.01, 0.99),
-        'repair_rate': (0.01, 0.99),
-        'misrepair_rate': (0.01, 0.99),
-        'recovery_rate': (0.01, 0.99),
-        'dose_gy': (0.1, 10.0),
+        "recognition_rate": (0.01, 0.99),
+        "repair_rate": (0.01, 0.99),
+        "misrepair_rate": (0.01, 0.99),
+        "recovery_rate": (0.01, 0.99),
+        "dose_gy": (0.1, 10.0),
     }
 
     denorm = np.zeros_like(normalized_samples)
@@ -143,14 +142,14 @@ def batch_results_df(param_names, normalized_samples):
 
     # Add outputs (synthetic but realistic)
     np.random.seed(42)
-    df['total_repairs'] = np.random.randint(50, 500, n_samples)
-    df['repair_time'] = np.random.uniform(1.0, 100.0, n_samples)
-    df['survival'] = np.random.uniform(0.0, 1.0, n_samples)
+    df["total_repairs"] = np.random.randint(50, 500, n_samples)
+    df["repair_time"] = np.random.uniform(1.0, 100.0, n_samples)
+    df["survival"] = np.random.uniform(0.0, 1.0, n_samples)
 
     # Add metadata
-    df['run_id'] = [f'run_{i:03d}' for i in range(n_samples)]
-    df['seed'] = [42 + i for i in range(n_samples)]
-    df['timestamp'] = pd.Timestamp.now()
+    df["run_id"] = [f"run_{i:03d}" for i in range(n_samples)]
+    df["seed"] = [42 + i for i in range(n_samples)]
+    df["timestamp"] = pd.Timestamp.now()
 
     return df
 
@@ -168,8 +167,14 @@ def sobol_output_vector(normalized_samples):
     """
     # Linear + interaction model
     x0, x1, x2, x3, x4 = normalized_samples.T
-    Y = (0.5 * x0 + 0.3 * x1 + 0.1 * x2 + 0.2 * x3 * x0 + 0.05 * x4 +
-         np.random.normal(0, 0.02, len(x0)))  # Add noise
+    Y = (
+        0.5 * x0
+        + 0.3 * x1
+        + 0.1 * x2
+        + 0.2 * x3 * x0
+        + 0.05 * x4
+        + np.random.normal(0, 0.02, len(x0))
+    )  # Add noise
     return Y
 
 
@@ -177,21 +182,20 @@ def sobol_output_vector(normalized_samples):
 def morris_output_vector(normalized_samples):
     """Generate output vector for Morris screening tests."""
     x0, x1, x2, x3, x4 = normalized_samples.T
-    Y = (0.7 * x0 + 0.3 * x1 + 0.1 * x2 +
-         np.random.normal(0, 0.01, len(x0)))
+    Y = 0.7 * x0 + 0.3 * x1 + 0.1 * x2 + np.random.normal(0, 0.01, len(x0))
     return Y
 
 
 @pytest.fixture
 def cache_dir(tmp_path):
     """Temporary directory for caching simulation results."""
-    return tmp_path / 'cache'
+    return tmp_path / "cache"
 
 
 @pytest.fixture
 def tmp_data_dir(tmp_path):
     """Temporary directory for test data files."""
-    return tmp_path / 'data'
+    return tmp_path / "data"
 
 
 @pytest.fixture
@@ -205,23 +209,29 @@ def sobol_batch_results(param_names):
     from SALib.sample import saltelli
 
     problem = {
-        'num_vars': len(param_names),
-        'names': param_names,
-        'bounds': [(0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.1, 10.0)],
+        "num_vars": len(param_names),
+        "names": param_names,
+        "bounds": [(0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.1, 10.0)],
     }
     X = saltelli.sample(problem, 64, calc_second_order=False)
 
     # Known sensitivity structure for testing
     np.random.seed(42)
-    Y = (0.5 * X[:, 0] + 0.3 * X[:, 1] + 0.1 * X[:, 2] + 0.05 * X[:, 3] + 0.02 * X[:, 4]
-         + np.random.normal(0, 0.01, len(X)))
+    Y = (
+        0.5 * X[:, 0]
+        + 0.3 * X[:, 1]
+        + 0.1 * X[:, 2]
+        + 0.05 * X[:, 3]
+        + 0.02 * X[:, 4]
+        + np.random.normal(0, 0.01, len(X))
+    )
 
     df = pd.DataFrame(X, columns=param_names)
-    df['survival'] = Y
-    df['total_repairs'] = np.random.randint(50, 500, len(X))
-    df['repair_time'] = np.random.uniform(1.0, 100.0, len(X))
-    df['run_id'] = [f'run_{i:05d}' for i in range(len(X))]
-    df['seed'] = [42 + i for i in range(len(X))]
+    df["survival"] = Y
+    df["total_repairs"] = np.random.randint(50, 500, len(X))
+    df["repair_time"] = np.random.uniform(1.0, 100.0, len(X))
+    df["run_id"] = [f"run_{i:05d}" for i in range(len(X))]
+    df["seed"] = [42 + i for i in range(len(X))]
 
     return df
 
@@ -236,23 +246,29 @@ def sobol_batch_results_second_order(param_names):
     from SALib.sample import saltelli
 
     problem = {
-        'num_vars': len(param_names),
-        'names': param_names,
-        'bounds': [(0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.1, 10.0)],
+        "num_vars": len(param_names),
+        "names": param_names,
+        "bounds": [(0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.1, 10.0)],
     }
     X = saltelli.sample(problem, 64, calc_second_order=True)
 
     # Known sensitivity structure for testing
     np.random.seed(42)
-    Y = (0.5 * X[:, 0] + 0.3 * X[:, 1] + 0.1 * X[:, 2] + 0.05 * X[:, 3] + 0.02 * X[:, 4]
-         + np.random.normal(0, 0.01, len(X)))
+    Y = (
+        0.5 * X[:, 0]
+        + 0.3 * X[:, 1]
+        + 0.1 * X[:, 2]
+        + 0.05 * X[:, 3]
+        + 0.02 * X[:, 4]
+        + np.random.normal(0, 0.01, len(X))
+    )
 
     df = pd.DataFrame(X, columns=param_names)
-    df['survival'] = Y
-    df['total_repairs'] = np.random.randint(50, 500, len(X))
-    df['repair_time'] = np.random.uniform(1.0, 100.0, len(X))
-    df['run_id'] = [f'run_{i:05d}' for i in range(len(X))]
-    df['seed'] = [42 + i for i in range(len(X))]
+    df["survival"] = Y
+    df["total_repairs"] = np.random.randint(50, 500, len(X))
+    df["repair_time"] = np.random.uniform(1.0, 100.0, len(X))
+    df["run_id"] = [f"run_{i:05d}" for i in range(len(X))]
+    df["seed"] = [42 + i for i in range(len(X))]
 
     return df
 
@@ -268,22 +284,26 @@ def morris_batch_results(param_names):
     from SALib.sample import morris as morris_sample
 
     problem = {
-        'num_vars': len(param_names),
-        'names': param_names,
-        'bounds': [(0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.1, 10.0)],
+        "num_vars": len(param_names),
+        "names": param_names,
+        "bounds": [(0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.1, 10.0)],
     }
     X = morris_sample.sample(problem, N=20, num_levels=10)
 
     np.random.seed(42)
-    Y = (0.7 * X[:, 0] + 0.3 * X[:, 1] + 0.05 * X[:, 2]
-         + np.random.normal(0, 0.01, len(X)))
+    Y = (
+        0.7 * X[:, 0]
+        + 0.3 * X[:, 1]
+        + 0.05 * X[:, 2]
+        + np.random.normal(0, 0.01, len(X))
+    )
 
     df = pd.DataFrame(X, columns=param_names)
-    df['survival'] = Y
-    df['total_repairs'] = np.random.randint(50, 500, len(X))
-    df['repair_time'] = np.random.uniform(1.0, 100.0, len(X))
-    df['run_id'] = [f'run_{i:05d}' for i in range(len(X))]
-    df['seed'] = [42 + i for i in range(len(X))]
+    df["survival"] = Y
+    df["total_repairs"] = np.random.randint(50, 500, len(X))
+    df["repair_time"] = np.random.uniform(1.0, 100.0, len(X))
+    df["run_id"] = [f"run_{i:05d}" for i in range(len(X))]
+    df["seed"] = [42 + i for i in range(len(X))]
 
     return df
 
@@ -291,4 +311,4 @@ def morris_batch_results(param_names):
 @pytest.fixture
 def output_dir(tmp_path):
     """Temporary directory for OutputExporter tests."""
-    return tmp_path / 'output'
+    return tmp_path / "output"

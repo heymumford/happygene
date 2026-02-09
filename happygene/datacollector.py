@@ -1,4 +1,5 @@
 """DataCollector for 3-tier data collection (model, individual, gene level)."""
+
 from typing import Dict, Callable, Any, List
 from collections import deque
 import pandas as pd

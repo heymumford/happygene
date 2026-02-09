@@ -1,4 +1,3 @@
-
 # Copyright (C) 2026 Eric C. Mumford <ericmumford@outlook.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -57,9 +56,7 @@ def plot_repair_time_series(results: List[Dict[str, Any]]) -> go.Figure:
     """
     if not results:
         fig = go.Figure()
-        fig.add_trace(
-            go.Scatter(x=[], y=[], mode="lines", name="Repair Count")
-        )
+        fig.add_trace(go.Scatter(x=[], y=[], mode="lines", name="Repair Count"))
         fig.update_layout(
             title="Repair Count Over Time (Empty Dataset)",
             xaxis_title="Completion Time (s)",

@@ -1,4 +1,5 @@
 """GeneNetwork: the main simulation model."""
+
 from typing import List
 from happygene.base import SimulationModel
 from happygene.entities import Individual

@@ -1,4 +1,5 @@
 """Smoke tests for example scripts."""
+
 import subprocess
 import sys
 import pytest
@@ -22,12 +23,13 @@ class TestExamples:
             [sys.executable, "examples/simple_duplication.py"],
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=30,
         )
 
         # Should exit successfully
-        assert result.returncode == 0, \
-            f"Example script failed with code {result.returncode}\nstderr: {result.stderr}"
+        assert (
+            result.returncode == 0
+        ), f"Example script failed with code {result.returncode}\nstderr: {result.stderr}"
 
         # Should produce output
         assert len(result.stdout) > 0, "Example script produced no output"
@@ -37,7 +39,9 @@ class TestExamples:
         assert "Creating population" in result.stdout, "Output missing population setup"
         assert "Running simulation" in result.stdout, "Output missing simulation"
         assert "SIMULATION RESULTS" in result.stdout, "Output missing results section"
-        assert "SIMULATION COMPLETE" in result.stdout, "Output missing completion marker"
+        assert (
+            "SIMULATION COMPLETE" in result.stdout
+        ), "Output missing completion marker"
 
         # Should contain fitness statistics
         assert "mean fitness" in result.stdout, "Output missing fitness statistics"
@@ -51,7 +55,7 @@ class TestExamples:
             [sys.executable, "examples/simple_duplication.py"],
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=30,
         )
 
         assert result.returncode == 0
@@ -85,30 +89,41 @@ class TestExamples:
             [sys.executable, "examples/regulatory_network.py"],
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=30,
         )
 
         # Should exit successfully
-        assert result.returncode == 0, \
-            f"Example script failed with code {result.returncode}\nstderr: {result.stderr}"
+        assert (
+            result.returncode == 0
+        ), f"Example script failed with code {result.returncode}\nstderr: {result.stderr}"
 
         # Should produce output
         assert len(result.stdout) > 0, "Example script produced no output"
 
         # Should contain key output markers
         assert "Regulatory Network Example" in result.stdout, "Output missing title"
-        assert "Creating regulatory population" in result.stdout, "Output missing population setup"
-        assert "Hill kinetics expression model" in result.stdout, "Output missing Hill expression config"
-        assert "ThresholdSelection configured" in result.stdout, "Output missing threshold selection config"
+        assert (
+            "Creating regulatory population" in result.stdout
+        ), "Output missing population setup"
+        assert (
+            "Hill kinetics expression model" in result.stdout
+        ), "Output missing Hill expression config"
+        assert (
+            "ThresholdSelection configured" in result.stdout
+        ), "Output missing threshold selection config"
         assert "Running simulation" in result.stdout, "Output missing simulation"
         assert "SIMULATION RESULTS" in result.stdout, "Output missing results section"
-        assert "SIMULATION COMPLETE" in result.stdout, "Output missing completion marker"
+        assert (
+            "SIMULATION COMPLETE" in result.stdout
+        ), "Output missing completion marker"
 
         # Should show fitness statistics
         assert "Fitness Summary" in result.stdout, "Output missing fitness statistics"
 
         # Should show selection pressure analysis
-        assert "Selection Pressure Analysis" in result.stdout, "Output missing selection analysis"
+        assert (
+            "Selection Pressure Analysis" in result.stdout
+        ), "Output missing selection analysis"
 
     def test_regulatory_network_produces_data(self):
         """Test that regulatory_network.py actually collects multi-level data.
@@ -120,7 +135,7 @@ class TestExamples:
             [sys.executable, "examples/regulatory_network.py"],
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=30,
         )
 
         assert result.returncode == 0
@@ -137,4 +152,6 @@ class TestExamples:
         assert "250" in result.stdout, "Should have 250 gene records"
 
         # Should show gene expression statistics
-        assert "Gene Expression" in result.stdout, "Output missing gene expression stats"
+        assert (
+            "Gene Expression" in result.stdout
+        ), "Output missing gene expression stats"

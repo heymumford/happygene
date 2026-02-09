@@ -106,7 +106,9 @@ class ResponseSurfaceModel:
 
         # Fit model
         if self.method == "rf":
-            self.model = RandomForestRegressor(n_estimators=100, random_state=42, max_depth=10)
+            self.model = RandomForestRegressor(
+                n_estimators=100, random_state=42, max_depth=10
+            )
         else:
             self.model = LinearRegression()
 
@@ -151,7 +153,10 @@ class ResponseSurfaceModel:
         return self.model.predict(X_test)
 
     def cross_validate(
-        self, batch_results: pd.DataFrame, output_col: str = "survival", cv_folds: int = 5
+        self,
+        batch_results: pd.DataFrame,
+        output_col: str = "survival",
+        cv_folds: int = 5,
     ) -> Dict[str, float]:
         """Cross-validate model performance.
 
@@ -178,8 +183,9 @@ class ResponseSurfaceModel:
         y = batch_results[output_col].values
 
         # Use fitted scaler for consistency with predict()
-        if not hasattr(self, 'scaler') or self.scaler is None:
+        if not hasattr(self, "scaler") or self.scaler is None:
             from sklearn.preprocessing import StandardScaler
+
             self.scaler = StandardScaler()
             X_scaled = self.scaler.fit_transform(X)
         else:
@@ -197,7 +203,9 @@ class ResponseSurfaceModel:
 
         # Fit model for scoring
         if self.method == "rf":
-            model = RandomForestRegressor(n_estimators=100, random_state=42, max_depth=10)
+            model = RandomForestRegressor(
+                n_estimators=100, random_state=42, max_depth=10
+            )
         else:
             model = LinearRegression()
 

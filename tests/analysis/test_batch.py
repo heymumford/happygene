@@ -16,10 +16,10 @@ from hypothesis import strategies as st
 
 from happygene.analysis.batch import BatchSimulator
 
-
 # ============================================================================
 # TIER 1: CONTRACT TESTS - BatchSimulator interface and sample generation
 # ============================================================================
+
 
 class TestBatchSimulatorCreation:
     """Contract: Can create BatchSimulator with valid inputs."""
@@ -36,7 +36,9 @@ class TestBatchSimulatorCreation:
         sim = BatchSimulator(sim_factory, param_space, seed=42)
         assert sim.param_space == param_space
 
-    def test_batch_simulator_stores_param_names(self, sim_factory, param_space, param_names):
+    def test_batch_simulator_stores_param_names(
+        self, sim_factory, param_space, param_names
+    ):
         """param_names extracted in consistent order."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
         assert list(sim.param_names) == param_names
@@ -48,7 +50,7 @@ class TestSampleGeneration:
     def test_generate_samples_sobol_shape(self, sim_factory, param_space):
         """Sobol samples shape is (n_samples, n_params)."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
-        samples = sim.generate_samples(256, sampler='sobol')
+        samples = sim.generate_samples(256, sampler="sobol")
 
         assert samples.shape == (256, len(param_space))
         assert isinstance(samples, np.ndarray)
@@ -57,7 +59,7 @@ class TestSampleGeneration:
         """Saltelli (Sobol extended) samples shape calculation."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
         # Saltelli creates 2(d+2)N samples from SALib (approx 12N for d=5)
-        samples = sim.generate_samples(64, sampler='saltelli')
+        samples = sim.generate_samples(64, sampler="saltelli")
 
         # Just verify it returns 2D array with correct n_params
         assert samples.ndim == 2
@@ -68,7 +70,7 @@ class TestSampleGeneration:
     def test_generate_samples_morris_shape(self, sim_factory, param_space):
         """Morris samples shape for screening."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
-        samples = sim.generate_samples(10, sampler='morris')
+        samples = sim.generate_samples(10, sampler="morris")
 
         # Morris: (num_trajectories * (d+1), d)
         n_params = len(param_space)
@@ -77,7 +79,7 @@ class TestSampleGeneration:
     def test_generate_samples_normalized_to_01(self, sim_factory, param_space):
         """All samples in [0, 1] normalized space."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
-        samples = sim.generate_samples(256, sampler='sobol')
+        samples = sim.generate_samples(256, sampler="sobol")
 
         assert np.all(samples >= 0.0), "Samples must be >= 0.0"
         assert np.all(samples <= 1.0), "Samples must be <= 1.0"
@@ -93,7 +95,9 @@ class TestSampleGeneration:
 class TestBatchExecution:
     """Contract: Run batch simulations and collect outputs."""
 
-    def test_run_batch_returns_dataframe(self, sim_factory, param_space, normalized_samples):
+    def test_run_batch_returns_dataframe(
+        self, sim_factory, param_space, normalized_samples
+    ):
         """run_batch returns pandas DataFrame."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
 
@@ -119,7 +123,7 @@ class TestBatchExecution:
         sim = BatchSimulator(sim_factory, param_space, seed=42)
         results = sim.run_batch(normalized_samples, n_generations=10)
 
-        expected_outputs = {'total_repairs', 'repair_time', 'survival'}
+        expected_outputs = {"total_repairs", "repair_time", "survival"}
         assert expected_outputs.issubset(results.columns)
 
     def test_run_batch_output_columns_include_metadata(
@@ -129,8 +133,8 @@ class TestBatchExecution:
         sim = BatchSimulator(sim_factory, param_space, seed=42)
         results = sim.run_batch(normalized_samples, n_generations=10)
 
-        assert 'run_id' in results.columns
-        assert 'seed' in results.columns
+        assert "run_id" in results.columns
+        assert "seed" in results.columns
 
     def test_run_batch_row_count_matches_samples(
         self, sim_factory, param_space, normalized_samples
@@ -158,7 +162,7 @@ class TestBatchExecution:
         """executor='sequential' executes without error."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
         results = sim.run_batch(
-            normalized_samples, n_generations=10, executor='sequential'
+            normalized_samples, n_generations=10, executor="sequential"
         )
 
         assert len(results) == len(normalized_samples)
@@ -168,26 +172,27 @@ class TestBatchExecution:
 # TIER 2: PROPERTY-BASED TESTS - Reproducibility and determinism
 # ============================================================================
 
+
 class TestDeterministicSampling:
     """Property: Same seed → identical samples."""
 
     def test_deterministic_sobol_samples_under_seed(self, sim_factory, param_space):
         """Sobol samples identical for same seed."""
         sim1 = BatchSimulator(sim_factory, param_space, seed=42)
-        samples1 = sim1.generate_samples(128, sampler='sobol')
+        samples1 = sim1.generate_samples(128, sampler="sobol")
 
         sim2 = BatchSimulator(sim_factory, param_space, seed=42)
-        samples2 = sim2.generate_samples(128, sampler='sobol')
+        samples2 = sim2.generate_samples(128, sampler="sobol")
 
         assert np.allclose(samples1, samples2)
 
     def test_deterministic_morris_samples_under_seed(self, sim_factory, param_space):
         """Morris samples have same shape and bounds for same seed (determinism may vary)."""
         sim1 = BatchSimulator(sim_factory, param_space, seed=42)
-        samples1 = sim1.generate_samples(10, sampler='morris')
+        samples1 = sim1.generate_samples(10, sampler="morris")
 
         sim2 = BatchSimulator(sim_factory, param_space, seed=42)
-        samples2 = sim2.generate_samples(10, sampler='morris')
+        samples2 = sim2.generate_samples(10, sampler="morris")
 
         # Morris sampler is not guaranteed to be fully deterministic, but should
         # produce same shape and be in [0, 1] for same seed
@@ -198,10 +203,10 @@ class TestDeterministicSampling:
     def test_different_seeds_produce_different_samples(self, sim_factory, param_space):
         """Different seed → different samples (with high probability)."""
         sim1 = BatchSimulator(sim_factory, param_space, seed=42)
-        samples1 = sim1.generate_samples(256, sampler='sobol')
+        samples1 = sim1.generate_samples(256, sampler="sobol")
 
         sim2 = BatchSimulator(sim_factory, param_space, seed=123)
-        samples2 = sim2.generate_samples(256, sampler='sobol')
+        samples2 = sim2.generate_samples(256, sampler="sobol")
 
         # Should not be identical (Sobol is deterministic but different seeds differ)
         assert not np.allclose(samples1, samples2)
@@ -234,7 +239,9 @@ class TestSeedCoverage:
     """Property: Seed parameter space coverage."""
 
     @given(seed=st.integers(0, 2**31 - 1), n_samples=st.integers(10, 100))
-    @settings(max_examples=20, suppress_health_check=[HealthCheck.function_scoped_fixture])
+    @settings(
+        max_examples=20, suppress_health_check=[HealthCheck.function_scoped_fixture]
+    )
     def test_arbitrary_seeds_produce_valid_samples(
         self, sim_factory, param_space, seed, n_samples
     ):
@@ -251,6 +258,7 @@ class TestSeedCoverage:
 # TIER 3: CHAOS TESTS - Error handling and edge cases
 # ============================================================================
 
+
 class TestInputValidation:
     """Chaos: Handle invalid/edge-case inputs gracefully."""
 
@@ -261,19 +269,17 @@ class TestInputValidation:
 
     def test_batch_simulator_rejects_invalid_bounds_low_gte_high(self, sim_factory):
         """Rejects param bounds where low >= high."""
-        bad_space = {'rate': (0.5, 0.1)}  # Invalid: low > high
+        bad_space = {"rate": (0.5, 0.1)}  # Invalid: low > high
         with pytest.raises(ValueError):
             BatchSimulator(sim_factory, bad_space, seed=42)
 
     def test_batch_simulator_rejects_negative_bounds(self, sim_factory):
         """Rejects negative parameter bounds."""
-        bad_space = {'rate': (-0.5, 0.5)}
+        bad_space = {"rate": (-0.5, 0.5)}
         with pytest.raises(ValueError):
             BatchSimulator(sim_factory, bad_space, seed=42)
 
-    def test_run_batch_with_wrong_sample_shape(
-        self, sim_factory, param_space
-    ):
+    def test_run_batch_with_wrong_sample_shape(self, sim_factory, param_space):
         """Rejects samples with mismatched n_params."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
 
@@ -283,7 +289,9 @@ class TestInputValidation:
         with pytest.raises((ValueError, IndexError)):
             sim.run_batch(bad_samples, n_generations=10)
 
-    def test_run_batch_with_zero_generations(self, sim_factory, param_space, normalized_samples):
+    def test_run_batch_with_zero_generations(
+        self, sim_factory, param_space, normalized_samples
+    ):
         """Handles n_generations=0 without crash."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
         results = sim.run_batch(normalized_samples, n_generations=0)
@@ -296,18 +304,18 @@ class TestEdgeCases:
 
     def test_single_parameter_sweep(self, sim_factory):
         """Sensitivity analysis with only 1 parameter."""
-        param_space = {'rate': (0.0, 1.0)}
+        param_space = {"rate": (0.0, 1.0)}
         sim = BatchSimulator(sim_factory, param_space, seed=42)
-        samples = sim.generate_samples(16, sampler='sobol')
+        samples = sim.generate_samples(16, sampler="sobol")
 
         assert samples.shape == (16, 1)
         assert np.all(samples >= 0) and np.all(samples <= 1)
 
     def test_many_parameters(self, sim_factory):
         """High-dimensional parameter space (15 params)."""
-        param_space = {f'param_{i}': (0.0, 1.0) for i in range(15)}
+        param_space = {f"param_{i}": (0.0, 1.0) for i in range(15)}
         sim = BatchSimulator(sim_factory, param_space, seed=42)
-        samples = sim.generate_samples(64, sampler='sobol')
+        samples = sim.generate_samples(64, sampler="sobol")
 
         assert samples.shape == (64, 15)
         assert np.all(np.isfinite(samples))
@@ -320,13 +328,13 @@ class TestEdgeCases:
         results = sim.run_batch(normalized_samples, n_generations=10)
 
         # Should have all expected outputs
-        expected_outputs = {'total_repairs', 'repair_time', 'survival'}
+        expected_outputs = {"total_repairs", "repair_time", "survival"}
         assert expected_outputs.issubset(results.columns)
 
     def test_small_sample_size(self, sim_factory, param_space):
         """Small sample size (n=1) handled correctly."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
-        samples = sim.generate_samples(1, sampler='sobol')
+        samples = sim.generate_samples(1, sampler="sobol")
 
         assert samples.shape == (1, len(param_space))
 
@@ -340,10 +348,12 @@ class TestNumericalEdgeCases:
 
         # Manually create boundary samples
         n_params = len(param_space)
-        samples = np.vstack([
-            np.zeros(n_params),  # All 0
-            np.ones(n_params),   # All 1
-        ])
+        samples = np.vstack(
+            [
+                np.zeros(n_params),  # All 0
+                np.ones(n_params),  # All 1
+            ]
+        )
 
         results = sim.run_batch(samples, n_generations=10)
         assert len(results) == 2
@@ -351,7 +361,7 @@ class TestNumericalEdgeCases:
 
     def test_very_small_parameter_range(self, sim_factory):
         """Very narrow parameter ranges work correctly."""
-        param_space = {'rate': (0.4999, 0.5001)}  # Tiny range
+        param_space = {"rate": (0.4999, 0.5001)}  # Tiny range
         sim = BatchSimulator(sim_factory, param_space, seed=42)
         samples = sim.generate_samples(32)
 
@@ -364,6 +374,7 @@ class TestNumericalEdgeCases:
 # TIER 4: PERFORMANCE TESTS - Scaling behavior
 # ============================================================================
 
+
 class TestPerformanceScaling:
     """Benchmark: Execution time scales with n_samples."""
 
@@ -374,7 +385,7 @@ class TestPerformanceScaling:
     ):
         """Batch execution time scales roughly linearly with n_samples."""
         sim = BatchSimulator(sim_factory, param_space, seed=42)
-        samples = sim.generate_samples(n_samples, sampler='sobol')
+        samples = sim.generate_samples(n_samples, sampler="sobol")
 
         # Benchmark the batch run
         benchmark(sim.run_batch, samples, n_generations=10)
@@ -385,4 +396,4 @@ class TestPerformanceScaling:
         sim = BatchSimulator(sim_factory, param_space, seed=42)
 
         # Generate 10,000 samples
-        benchmark(sim.generate_samples, 10000, sampler='sobol')
+        benchmark(sim.generate_samples, 10000, sampler="sobol")

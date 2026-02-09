@@ -1,4 +1,3 @@
-
 # Copyright (C) 2026 Eric C. Mumford <ericmumford@outlook.com>
 #
 # This program is free software: you can redistribute it and/or modify

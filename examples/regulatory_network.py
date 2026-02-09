@@ -46,7 +46,9 @@ def main():
     num_genes = 5
 
     individuals = create_regulatory_individuals(num_individuals, num_genes)
-    print(f"  ✓ Created {num_individuals} individuals with {num_genes} regulatory genes")
+    print(
+        f"  ✓ Created {num_individuals} individuals with {num_genes} regulatory genes"
+    )
     print(f"    Gene names: TF1, TF2, TF3, TF4, TF5 (transcription factors)")
 
     # Step 2: Configure Hill kinetics expression model
@@ -54,9 +56,9 @@ def main():
     # Hill equation: E = v_max * [tf]^n / (k^n + [tf]^n)
     # This models cooperative binding with Hill coefficient (n=2 for cooperativity)
     hill_model = HillExpression(
-        v_max=1.0,     # Maximum expression level
-        k=0.5,         # Half-saturation point (Km)
-        n=2.0          # Hill coefficient (cooperativity: 2 = stronger cooperativity)
+        v_max=1.0,  # Maximum expression level
+        k=0.5,  # Half-saturation point (Km)
+        n=2.0,  # Hill coefficient (cooperativity: 2 = stronger cooperativity)
     )
     print(f"  ✓ HillExpression configured:")
     print(f"    v_max={hill_model.v_max} (max expression)")
@@ -69,7 +71,9 @@ def main():
     threshold_model = ThresholdSelection(threshold=0.4)
     print(f"  ✓ ThresholdSelection configured:")
     print(f"    threshold={threshold_model.threshold}")
-    print(f"    Selection rule: fitness = 1.0 if mean_expr > {threshold_model.threshold}, else 0.0")
+    print(
+        f"    Selection rule: fitness = 1.0 if mean_expr > {threshold_model.threshold}, else 0.0"
+    )
 
     # Step 4: Configure mutation model
     print("\n[4/6] Configuring mutation model...")
@@ -84,7 +88,7 @@ def main():
     conditions = Conditions(
         tf_concentration=0.7,  # Moderate transcription factor level
         temperature=37.0,
-        nutrients=1.0
+        nutrients=1.0,
     )
 
     network = GeneNetwork(
@@ -93,14 +97,18 @@ def main():
         selection_model=threshold_model,
         mutation_model=mutate_model,
         seed=42,  # Reproducible results
-        conditions=conditions
+        conditions=conditions,
     )
 
     # Multi-level data collector: model, individual, and gene metrics
     collector = DataCollector(
         model_reporters={
             "mean_fitness": lambda m: m.compute_mean_fitness(),
-            "mean_expression": lambda m: sum(ind.mean_expression() for ind in m.individuals) / len(m.individuals) if m.individuals else 0.0,
+            "mean_expression": lambda m: (
+                sum(ind.mean_expression() for ind in m.individuals) / len(m.individuals)
+                if m.individuals
+                else 0.0
+            ),
         },
         individual_reporters={
             "fitness": lambda ind: ind.fitness,
@@ -108,10 +116,12 @@ def main():
         },
         gene_reporters={
             "expression_level": lambda gene: gene.expression_level,
-        }
+        },
     )
     print(f"  ✓ GeneNetwork created with multi-level DataCollector")
-    print(f"  ✓ Environmental conditions: tf_concentration={conditions.tf_concentration}")
+    print(
+        f"  ✓ Environmental conditions: tf_concentration={conditions.tf_concentration}"
+    )
     print(f"  ✓ Model reporters: mean_fitness, mean_expression")
     print(f"  ✓ Individual reporters: fitness, mean_expression")
     print(f"  ✓ Gene reporters: expression_level")
@@ -156,19 +166,25 @@ def main():
     print(f"  Regulatory genes:        {num_genes} genes (TF1-TF5)")
     print(f"  Generations simulated:   {num_generations}")
 
-    print(f"\nFitness Summary (ThresholdSelection, threshold={threshold_model.threshold}):")
+    print(
+        f"\nFitness Summary (ThresholdSelection, threshold={threshold_model.threshold}):"
+    )
     print(f"  Initial mean fitness:    {initial_fitness:.4f}")
     print(f"  Final mean fitness:      {final_fitness:.4f}")
     print(f"  Mean fitness (all gens): {mean_fitness:.4f}")
     print(f"  Maximum fitness:         {max_fitness:.4f}")
     print(f"  Minimum fitness:         {min_fitness:.4f}")
-    print(f"  Selection pressure:      {'Strong' if final_fitness > mean_fitness else 'Weak'} (final > mean)")
+    print(
+        f"  Selection pressure:      {'Strong' if final_fitness > mean_fitness else 'Weak'} (final > mean)"
+    )
 
     print(f"\nExpression Summary (Hill Kinetics):")
     print(f"  Initial mean expression: {initial_expr:.4f}")
     print(f"  Final mean expression:   {final_expr:.4f}")
     print(f"  Maximum expression:      {max_expr:.4f}")
-    print(f"  Expression trend:        {'↑ Increasing' if final_expr > initial_expr else '↓ Decreasing'}")
+    print(
+        f"  Expression trend:        {'↑ Increasing' if final_expr > initial_expr else '↓ Decreasing'}"
+    )
 
     print(f"\nData Collection Summary:")
     print(f"  Model-level records:     {len(model_df)} (1 per generation)")
@@ -177,10 +193,14 @@ def main():
 
     # Calculate selection pressure effects
     print(f"\nSelection Pressure Analysis:")
-    survivors_per_gen = individual_df.groupby("generation")["fitness"].apply(lambda x: (x > 0).sum())
+    survivors_per_gen = individual_df.groupby("generation")["fitness"].apply(
+        lambda x: (x > 0).sum()
+    )
     if len(survivors_per_gen) > 0:
         avg_survivors = survivors_per_gen.mean()
-        print(f"  Average survivors/gen:   {avg_survivors:.1f}/{num_individuals} ({100*avg_survivors/num_individuals:.1f}%)")
+        print(
+            f"  Average survivors/gen:   {avg_survivors:.1f}/{num_individuals} ({100*avg_survivors/num_individuals:.1f}%)"
+        )
         print(f"  Bottleneck threshold:    {threshold_model.threshold}")
 
     # Gene-level statistics
@@ -188,10 +208,18 @@ def main():
         final_gen_genes = gene_df[gene_df["generation"] == num_generations]
         if len(final_gen_genes) > 0:
             print(f"\nGene Expression (Final Generation):")
-            print(f"  Mean expression level:   {final_gen_genes['expression_level'].mean():.4f}")
-            print(f"  Std dev:                 {final_gen_genes['expression_level'].std():.4f}")
-            print(f"  Min expression:          {final_gen_genes['expression_level'].min():.4f}")
-            print(f"  Max expression:          {final_gen_genes['expression_level'].max():.4f}")
+            print(
+                f"  Mean expression level:   {final_gen_genes['expression_level'].mean():.4f}"
+            )
+            print(
+                f"  Std dev:                 {final_gen_genes['expression_level'].std():.4f}"
+            )
+            print(
+                f"  Min expression:          {final_gen_genes['expression_level'].min():.4f}"
+            )
+            print(
+                f"  Max expression:          {final_gen_genes['expression_level'].max():.4f}"
+            )
 
     # Optional: Try to visualize with matplotlib
     try:
@@ -206,9 +234,15 @@ def main():
                 model_df["generation"],
                 model_df["mean_fitness"],
                 linewidth=2,
-                color="darkred"
+                color="darkred",
             )
-            axes[0, 0].axhline(y=threshold_model.threshold, color="red", linestyle="--", alpha=0.5, label="Selection threshold")
+            axes[0, 0].axhline(
+                y=threshold_model.threshold,
+                color="red",
+                linestyle="--",
+                alpha=0.5,
+                label="Selection threshold",
+            )
             axes[0, 0].set_xlabel("Generation")
             axes[0, 0].set_ylabel("Mean Fitness")
             axes[0, 0].set_title("Population Mean Fitness (Threshold Selection)")
@@ -221,9 +255,15 @@ def main():
                 model_df["generation"],
                 model_df["mean_expression"],
                 linewidth=2,
-                color="darkblue"
+                color="darkblue",
             )
-            axes[0, 1].axhline(y=threshold_model.threshold, color="red", linestyle="--", alpha=0.5, label="Selection threshold")
+            axes[0, 1].axhline(
+                y=threshold_model.threshold,
+                color="red",
+                linestyle="--",
+                alpha=0.5,
+                label="Selection threshold",
+            )
             axes[0, 1].set_xlabel("Generation")
             axes[0, 1].set_ylabel("Mean Expression Level")
             axes[0, 1].set_title("Population Mean Expression (Hill Kinetics)")
@@ -232,14 +272,16 @@ def main():
 
         # Plot 3: Fitness distribution in final generation
         if len(individual_df) > 0:
-            final_gen_indiv = individual_df[individual_df["generation"] == num_generations]
+            final_gen_indiv = individual_df[
+                individual_df["generation"] == num_generations
+            ]
             if len(final_gen_indiv) > 0:
                 axes[1, 0].hist(
                     final_gen_indiv["fitness"],
                     bins=10,
                     edgecolor="black",
                     alpha=0.7,
-                    color="darkred"
+                    color="darkred",
                 )
                 axes[1, 0].set_xlabel("Fitness")
                 axes[1, 0].set_ylabel("Count")
@@ -255,11 +297,13 @@ def main():
                     bins=30,
                     edgecolor="black",
                     alpha=0.7,
-                    color="darkblue"
+                    color="darkblue",
                 )
                 axes[1, 1].set_xlabel("Gene Expression Level")
                 axes[1, 1].set_ylabel("Frequency")
-                axes[1, 1].set_title(f"Gene Expression Distribution (Gen {num_generations})")
+                axes[1, 1].set_title(
+                    f"Gene Expression Distribution (Gen {num_generations})"
+                )
                 axes[1, 1].grid(True, alpha=0.3, axis="y")
 
         plt.tight_layout()
@@ -279,7 +323,9 @@ def main():
     print(f"  - Hill kinetics models sigmoidal gene response (cooperative binding)")
     print(f"  - Threshold selection creates bottlenecks (only fit individuals survive)")
     print(f"  - Evolution toward higher expression/fitness or oscillation possible")
-    print(f"  - This pattern models real regulatory networks (e.g., developmental genes)")
+    print(
+        f"  - This pattern models real regulatory networks (e.g., developmental genes)"
+    )
     print(f"\nNext steps:")
     print(f"  - Compare with constant expression model (see simple_duplication.py)")
     print(f"  - Try different threshold values (0.2, 0.5, 0.8)")
@@ -294,5 +340,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\nERROR: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)

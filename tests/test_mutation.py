@@ -1,4 +1,5 @@
 """Tests for mutation models."""
+
 import pytest
 from happygene.entities import Gene, Individual
 from happygene.mutation import MutationModel, PointMutation
@@ -14,6 +15,7 @@ class TestMutationModel:
 
     def test_mutation_model_subclass_must_implement_mutate(self):
         """Subclass must implement mutate() method."""
+
         class BrokenMutation(MutationModel):
             pass
 

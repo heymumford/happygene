@@ -55,13 +55,13 @@ def main():
         expression_model=expr_model,
         selection_model=select_model,
         mutation_model=mutate_model,
-        seed=42  # Reproducible results
+        seed=42,  # Reproducible results
     )
 
     collector = DataCollector(
         model_reporters={"mean_fitness": lambda m: m.compute_mean_fitness()},
         individual_reporters={"fitness": lambda ind: ind.fitness},
-        gene_reporters={"expression_level": lambda gene: gene.expression_level}
+        gene_reporters={"expression_level": lambda gene: gene.expression_level},
     )
     print("  ✓ GeneNetwork created with DataCollector")
     print(f"  ✓ Reproducible seed: 42")
@@ -131,11 +131,13 @@ def main():
                     final_gen_genes["expression_level"],
                     bins=30,
                     edgecolor="black",
-                    alpha=0.7
+                    alpha=0.7,
                 )
                 axes[1].set_xlabel("Gene Expression Level")
                 axes[1].set_ylabel("Frequency")
-                axes[1].set_title(f"Gene Expression Distribution (Gen {num_generations})")
+                axes[1].set_title(
+                    f"Gene Expression Distribution (Gen {num_generations})"
+                )
                 axes[1].grid(True, alpha=0.3, axis="y")
 
         plt.tight_layout()
@@ -164,5 +166,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\nERROR: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc(file=sys.stderr)
         sys.exit(1)

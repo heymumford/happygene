@@ -1,4 +1,5 @@
 """Integration tests for full simulation loop."""
+
 import pytest
 from happygene.entities import Gene, Individual
 from happygene.model import GeneNetwork
@@ -29,7 +30,7 @@ class TestFullSimulationLoop:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Initial state
@@ -56,7 +57,7 @@ class TestFullSimulationLoop:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Run for 10 generations
@@ -79,7 +80,7 @@ class TestFullSimulationLoop:
             selection_model=select_model,
             mutation_model=mutate_model,
             seed=42,
-            conditions=Conditions(tf_concentration=2.0)
+            conditions=Conditions(tf_concentration=2.0),
         )
 
         # After step: E = 2.0 * 2.0 + 1.0 = 5.0
@@ -104,7 +105,7 @@ class TestFullSimulationLoop:
             selection_model=select_model,
             mutation_model=mutate_model,
             seed=42,
-            conditions=Conditions(tf_concentration=2.0)
+            conditions=Conditions(tf_concentration=2.0),
         )
 
         initial_fitness = individual.fitness
@@ -130,7 +131,7 @@ class TestFullSimulationLoop:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         initial_expr = individual.genes[0].expression_level
@@ -158,7 +159,7 @@ class TestFullSimulationLoop:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=123
+            seed=123,
         )
         network1.run(5)
 
@@ -168,7 +169,7 @@ class TestFullSimulationLoop:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=123
+            seed=123,
         )
         network2.run(5)
 
@@ -176,4 +177,7 @@ class TestFullSimulationLoop:
         assert network1.generation == network2.generation == 5
 
         # Both should have same final expression (deterministic with same seed)
-        assert individual1.genes[0].expression_level == individual2.genes[0].expression_level
+        assert (
+            individual1.genes[0].expression_level
+            == individual2.genes[0].expression_level
+        )

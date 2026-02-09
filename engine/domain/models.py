@@ -1,4 +1,3 @@
-
 # Copyright (C) 2026 Eric C. Mumford <ericmumford@outlook.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -30,54 +29,59 @@ from enum import Enum
 from typing import List, Optional, Tuple
 from datetime import datetime
 
-
 # ============================================================================
 # Enums: Type-Safe Domain Values
 # ============================================================================
 
+
 class DamageType(str, Enum):
     """DNA damage classification (extensible)."""
-    DSB = "double_strand_break"           # Highly lethal
-    SSB = "single_strand_break"           # Usually repaired
-    CROSSLINK = "crosslink"               # Interstrand/protein
-    OXIDATIVE = "oxidative"               # Reactive oxygen species
-    DEPURINATION = "depurination"         # Purine loss
-    DEAMINATION = "deamination"           # Cytosine → Uracil
-    THYMINE_DIMER = "thymine_dimer"       # UV-induced
+
+    DSB = "double_strand_break"  # Highly lethal
+    SSB = "single_strand_break"  # Usually repaired
+    CROSSLINK = "crosslink"  # Interstrand/protein
+    OXIDATIVE = "oxidative"  # Reactive oxygen species
+    DEPURINATION = "depurination"  # Purine loss
+    DEAMINATION = "deamination"  # Cytosine → Uracil
+    THYMINE_DIMER = "thymine_dimer"  # UV-induced
 
 
 class RepairPathway(str, Enum):
     """DNA repair mechanism (extensible via plugin system)."""
-    NHEJ = "non_homologous_end_joining"   # Fast, error-prone
-    HR = "homologous_recombination"       # Accurate, slow
-    BER = "base_excision_repair"          # Small lesions
-    NER = "nucleotide_excision_repair"    # Bulky lesions
-    MMR = "mismatch_repair"               # Strand mismatches
-    TLS = "translesion_synthesis"         # Bypass (mutagenic)
-    DIRECT = "direct_reversal"            # Photolyase, AlkB
-    ALTEJ = "alternative_end_joining"     # NHEJ variant
+
+    NHEJ = "non_homologous_end_joining"  # Fast, error-prone
+    HR = "homologous_recombination"  # Accurate, slow
+    BER = "base_excision_repair"  # Small lesions
+    NER = "nucleotide_excision_repair"  # Bulky lesions
+    MMR = "mismatch_repair"  # Strand mismatches
+    TLS = "translesion_synthesis"  # Bypass (mutagenic)
+    DIRECT = "direct_reversal"  # Photolyase, AlkB
+    ALTEJ = "alternative_end_joining"  # NHEJ variant
 
 
 class CellFateStatus(str, Enum):
     """Cell outcome post-repair."""
-    VIABLE = "viable"                     # Repaired, survives
-    APOPTOSIS = "apoptosis"               # Programmed death
-    SENESCENCE = "senescence"             # Permanent cycle arrest
-    MITOTIC_DEATH = "mitotic_death"       # Dies at mitosis
-    TRANSFORMATION = "transformation"    # Becomes cancerous
+
+    VIABLE = "viable"  # Repaired, survives
+    APOPTOSIS = "apoptosis"  # Programmed death
+    SENESCENCE = "senescence"  # Permanent cycle arrest
+    MITOTIC_DEATH = "mitotic_death"  # Dies at mitosis
+    TRANSFORMATION = "transformation"  # Becomes cancerous
 
 
 class CellCyclePhase(str, Enum):
     """Cell cycle phase during damage."""
-    G1 = "G1"      # Gap 1 (unreplicated)
-    S = "S"        # Synthesis (replication fork)
-    G2 = "G2"      # Gap 2 (replicated)
-    M = "M"        # Mitosis
+
+    G1 = "G1"  # Gap 1 (unreplicated)
+    S = "S"  # Synthesis (replication fork)
+    G2 = "G2"  # Gap 2 (replicated)
+    M = "M"  # Mitosis
 
 
 # ============================================================================
 # Domain Model: Immutable Dataclasses
 # ============================================================================
+
 
 @dataclass(frozen=True)
 class Lesion:
@@ -90,11 +94,12 @@ class Lesion:
         1000
         >>> lesion.position_bp = 2000  # TypeError: frozen
     """
-    position_bp: int              # 0-indexed genomic position
-    damage_type: DamageType       # Type of damage
-    time_seconds: float           # When damage occurred
-    severity: float = 1.0         # 0-1 scale (0=none, 1=lethal)
-    protein_bound: bool = False   # Is a protein bound?
+
+    position_bp: int  # 0-indexed genomic position
+    damage_type: DamageType  # Type of damage
+    time_seconds: float  # When damage occurred
+    severity: float = 1.0  # 0-1 scale (0=none, 1=lethal)
+    protein_bound: bool = False  # Is a protein bound?
 
     def __post_init__(self):
         """Validate lesion invariants."""
@@ -120,10 +125,11 @@ class DamageProfile:
         - population_size in [1, 1,000,000]
         - All lesions present at t=0 (static profile)
     """
-    lesions: Tuple[Lesion, ...]                    # Immutable tuple
-    dose_gy: float                                 # Radiation dose (Gray)
-    population_size: int                           # Cells in population
-    cell_cycle_phase: CellCyclePhase               # When damage occurred
+
+    lesions: Tuple[Lesion, ...]  # Immutable tuple
+    dose_gy: float  # Radiation dose (Gray)
+    population_size: int  # Cells in population
+    cell_cycle_phase: CellCyclePhase  # When damage occurred
     created_at: datetime = field(default_factory=datetime.now)
 
     def __post_init__(self):
@@ -134,7 +140,9 @@ class DamageProfile:
 
         # Population range
         if not 1 <= self.population_size <= 1_000_000:
-            raise ValueError(f"population_size must be in [1, 1M], got {self.population_size}")
+            raise ValueError(
+                f"population_size must be in [1, 1M], got {self.population_size}"
+            )
 
         # Lesions temporal ordering
         for i in range(len(self.lesions) - 1):
@@ -162,12 +170,13 @@ class RepairEvent:
 
     Represents one repair action: which pathway, when, success?
     """
-    pathway: RepairPathway                # NHEJ, HR, BER, etc.
-    start_time: float                     # When repair began
-    end_time: float                       # When repair completed
-    lesions_repaired: int                 # Count of lesions fixed
-    lesions_unrepaired: int               # Count remaining
-    fidelity: float = 1.0                 # 0=error-prone, 1=perfect
+
+    pathway: RepairPathway  # NHEJ, HR, BER, etc.
+    start_time: float  # When repair began
+    end_time: float  # When repair completed
+    lesions_repaired: int  # Count of lesions fixed
+    lesions_unrepaired: int  # Count remaining
+    fidelity: float = 1.0  # 0=error-prone, 1=perfect
 
     def __post_init__(self):
         """Validate repair event invariants."""
@@ -204,13 +213,14 @@ class RepairOutcome:
         - repair_events ordered temporally (t0 < t1 < t2)
         - total_repaired <= initial_lesions
     """
+
     repair_events: Tuple[RepairEvent, ...] = field(default_factory=tuple)
     initial_lesions: int = 0
     total_repaired: int = 0
     total_unrepaired: int = 0
     completion_time: float = 0.0
-    success: bool = False                  # All lesions repaired?
-    ode_rmse: float = 0.0                  # ODE solver RMSE
+    success: bool = False  # All lesions repaired?
+    ode_rmse: float = 0.0  # ODE solver RMSE
 
     def __post_init__(self):
         """Validate repair outcome invariants."""
@@ -260,14 +270,17 @@ class CellFate:
 
     What happened to the cell? Viable, dead, senescent?
     """
+
     status: CellFateStatus
-    time_determined: float                 # When fate decided
+    time_determined: float  # When fate decided
     markers: dict = field(default_factory=dict)  # Biomarkers (γ-H2AX, p21, etc.)
 
     def __post_init__(self):
         """Validate cell fate invariants."""
         if self.time_determined < 0:
-            raise ValueError(f"time_determined must be >= 0, got {self.time_determined}")
+            raise ValueError(
+                f"time_determined must be >= 0, got {self.time_determined}"
+            )
 
 
 @dataclass(frozen=True)
@@ -281,10 +294,11 @@ class PopulationOutcome:
         - len(repair_outcomes) == len(cell_fates) == population_size
         - survival_rate in [0, 1]
     """
+
     damage_profile: DamageProfile
     repair_outcomes: Tuple[RepairOutcome, ...]
     cell_fates: Tuple[CellFate, ...]
-    elapsed_time: float                    # Simulation wall-clock time (seconds)
+    elapsed_time: float  # Simulation wall-clock time (seconds)
     random_seed: int = 42
 
     def __post_init__(self):
@@ -310,7 +324,9 @@ class PopulationOutcome:
         Returns:
             Value in [0, 1] representing survival rate.
         """
-        viable = sum(1 for fate in self.cell_fates if fate.status == CellFateStatus.VIABLE)
+        viable = sum(
+            1 for fate in self.cell_fates if fate.status == CellFateStatus.VIABLE
+        )
         return viable / len(self.cell_fates) if self.cell_fates else 0.0
 
     @property
@@ -321,7 +337,9 @@ class PopulationOutcome:
         Returns:
             Value in [0, 1] representing apoptosis rate.
         """
-        apoptotic = sum(1 for fate in self.cell_fates if fate.status == CellFateStatus.APOPTOSIS)
+        apoptotic = sum(
+            1 for fate in self.cell_fates if fate.status == CellFateStatus.APOPTOSIS
+        )
         return apoptotic / len(self.cell_fates) if self.cell_fates else 0.0
 
     @property
@@ -332,7 +350,9 @@ class PopulationOutcome:
         Returns:
             Value in [0, 1] representing senescence rate.
         """
-        senescent = sum(1 for fate in self.cell_fates if fate.status == CellFateStatus.SENESCENCE)
+        senescent = sum(
+            1 for fate in self.cell_fates if fate.status == CellFateStatus.SENESCENCE
+        )
         return senescent / len(self.cell_fates) if self.cell_fates else 0.0
 
     def summary(self) -> dict:

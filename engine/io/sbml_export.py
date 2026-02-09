@@ -1,4 +1,3 @@
-
 # Copyright (C) 2026 Eric C. Mumford <ericmumford@outlook.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -35,7 +34,6 @@ import xml.etree.ElementTree as ET
 
 from engine.domain.models import DamageProfile, DamageType, RepairPathway
 from engine.domain.config import HappyGeneConfig
-
 
 # SBML namespace for proper XML generation
 SBML_NAMESPACE = "http://www.sbml.org/sbml/level3/version2"
@@ -178,9 +176,7 @@ def _add_reactions(model: ET.Element) -> None:
 
 
 def _add_parameters(
-    model: ET.Element,
-    config: HappyGeneConfig,
-    damage_profile: DamageProfile
+    model: ET.Element, config: HappyGeneConfig, damage_profile: DamageProfile
 ) -> None:
     """Add solver configuration and damage profile parameters to model."""
     parameters = ET.SubElement(model, "listOfParameters")
@@ -235,7 +231,7 @@ def _indent_xml(elem: ET.Element, level: int = 0) -> None:
 def export_to_sbml(
     config: HappyGeneConfig,
     damage_profile: DamageProfile,
-    output_path: Union[str, Path]
+    output_path: Union[str, Path],
 ) -> Path:
     """
     Export simulation configuration to SBML (COPASI-compatible).

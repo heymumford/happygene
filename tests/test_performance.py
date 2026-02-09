@@ -1,4 +1,5 @@
 """Performance benchmarks for large-scale simulations."""
+
 import pytest
 from happygene.entities import Gene, Individual
 from happygene.model import GeneNetwork
@@ -37,14 +38,14 @@ class TestPerformanceBenchmarks:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # DataCollector with full 3-tier reporters
         collector = DataCollector(
             model_reporters={"generation": lambda m: m.generation},
             individual_reporters={"fitness": lambda ind: ind.fitness},
-            gene_reporters={"expression_level": lambda gene: gene.expression_level}
+            gene_reporters={"expression_level": lambda gene: gene.expression_level},
         )
 
         # Run simulation: 100 individuals, 50 genes, 100 generations
@@ -55,14 +56,15 @@ class TestPerformanceBenchmarks:
 
         # Verify data was collected
         gene_df = collector.get_gene_dataframe()
-        assert len(gene_df) == 500000, \
-            f"Expected 500k gene records, got {len(gene_df)}"
+        assert len(gene_df) == 500000, f"Expected 500k gene records, got {len(gene_df)}"
 
         # Verify DataFrames are non-empty
         model_df = collector.get_model_dataframe()
         individual_df = collector.get_individual_dataframe()
         assert len(model_df) == 100, f"Expected 100 model rows, got {len(model_df)}"
-        assert len(individual_df) == 10000, f"Expected 10k individual rows, got {len(individual_df)}"
+        assert (
+            len(individual_df) == 10000
+        ), f"Expected 10k individual rows, got {len(individual_df)}"
 
     @pytest.mark.slow
     def test_max_history_bounds_memory(self):
@@ -87,7 +89,7 @@ class TestPerformanceBenchmarks:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Create collector with max_history=1000 (limit memory)
@@ -95,7 +97,7 @@ class TestPerformanceBenchmarks:
             model_reporters={"generation": lambda m: m.generation},
             individual_reporters={"fitness": lambda ind: ind.fitness},
             gene_reporters={"expression_level": lambda gene: gene.expression_level},
-            max_history=1000
+            max_history=1000,
         )
 
         # Run 200 generations
@@ -109,8 +111,9 @@ class TestPerformanceBenchmarks:
         gene_df = collector.get_gene_dataframe()
         # With max_history=1000, we should have <= 1000 rows per collection
         # Actually max_history limits the total history, so check it's bounded
-        assert len(gene_df) <= 1000, \
-            f"max_history not enforced: got {len(gene_df)} rows, max should be 1000"
+        assert (
+            len(gene_df) <= 1000
+        ), f"max_history not enforced: got {len(gene_df)} rows, max should be 1000"
 
         # Verify generation column shows recent generations
         if len(gene_df) > 0:
@@ -118,5 +121,6 @@ class TestPerformanceBenchmarks:
             min_gen = gene_df["generation"].min()
             # Should only contain recent generations, not all 200
             gen_span = max_gen - min_gen
-            assert gen_span < 200, \
-                f"max_history not working: generation span {gen_span} is too large"
+            assert (
+                gen_span < 200
+            ), f"max_history not working: generation span {gen_span} is too large"

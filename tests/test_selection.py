@@ -1,7 +1,12 @@
 """Tests for selection models."""
+
 import pytest
 from happygene.entities import Gene, Individual
-from happygene.selection import SelectionModel, ProportionalSelection, ThresholdSelection
+from happygene.selection import (
+    SelectionModel,
+    ProportionalSelection,
+    ThresholdSelection,
+)
 
 
 class TestSelectionModel:
@@ -14,6 +19,7 @@ class TestSelectionModel:
 
     def test_selection_model_subclass_must_implement_compute_fitness(self):
         """Subclass must implement compute_fitness() method."""
+
         class BrokenSelection(SelectionModel):
             pass
 

@@ -1,4 +1,5 @@
 """Edge case tests: boundary conditions and extreme parameters."""
+
 import pytest
 from happygene.entities import Gene, Individual
 from happygene.model import GeneNetwork
@@ -26,7 +27,7 @@ class TestEdgeCases:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Should run without error
@@ -50,7 +51,7 @@ class TestEdgeCases:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         network.step()
@@ -74,7 +75,7 @@ class TestEdgeCases:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Should run without error
@@ -100,7 +101,7 @@ class TestEdgeCases:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Should run without error or numerical issues
@@ -126,19 +127,24 @@ class TestEdgeCases:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Record initial gene expression levels
-        initial_values = [gene.expression_level for ind in network.individuals for gene in ind.genes]
+        initial_values = [
+            gene.expression_level for ind in network.individuals for gene in ind.genes
+        ]
 
         # Run many generations
         network.run(100)
 
         # No gene values should have changed (rate=0 means no mutations)
-        final_values = [gene.expression_level for ind in network.individuals for gene in ind.genes]
-        assert initial_values == final_values, \
-            f"Genes changed despite 0 mutation rate: initial={initial_values}, final={final_values}"
+        final_values = [
+            gene.expression_level for ind in network.individuals for gene in ind.genes
+        ]
+        assert (
+            initial_values == final_values
+        ), f"Genes changed despite 0 mutation rate: initial={initial_values}, final={final_values}"
 
     def test_hundred_percent_mutation_rate(self):
         """Mutation rate = 1.0 should mutate all genes every generation.
@@ -156,17 +162,21 @@ class TestEdgeCases:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Record initial gene expression levels
-        initial_values = [gene.expression_level for ind in network.individuals for gene in ind.genes]
+        initial_values = [
+            gene.expression_level for ind in network.individuals for gene in ind.genes
+        ]
 
         # Run a few generations
         network.run(5)
 
         # At least some genes should have changed (extremely unlikely to stay same with rate=1.0)
-        final_values = [gene.expression_level for ind in network.individuals for gene in ind.genes]
+        final_values = [
+            gene.expression_level for ind in network.individuals for gene in ind.genes
+        ]
         changes = sum(1 for i, f in zip(initial_values, final_values) if i != f)
         assert changes > 0, "No genes changed despite 100% mutation rate"
 
@@ -189,7 +199,7 @@ class TestEdgeCases:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Should run without memory or performance issues
@@ -213,7 +223,7 @@ class TestEdgeCases:
             expression_model=expr_model,
             selection_model=select_model,
             mutation_model=mutate_model,
-            seed=42
+            seed=42,
         )
 
         # Should run without error

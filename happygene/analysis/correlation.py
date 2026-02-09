@@ -89,7 +89,10 @@ class CorrelationAnalyzer:
         return corr
 
     def parameter_output_correlation(
-        self, batch_results: pd.DataFrame, output_col: str = "survival", method: str = "pearson"
+        self,
+        batch_results: pd.DataFrame,
+        output_col: str = "survival",
+        method: str = "pearson",
     ) -> pd.DataFrame:
         """Compute correlation between parameters and output.
 

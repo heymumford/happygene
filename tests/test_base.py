@@ -1,4 +1,5 @@
 """Tests for SimulationModel abstract base class."""
+
 import pytest
 from happygene.base import SimulationModel
 

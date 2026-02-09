@@ -1,4 +1,3 @@
-
 # Copyright (C) 2026 Eric C. Mumford <ericmumford@outlook.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -140,11 +139,11 @@ def create_dashboard(results: List[Dict[str, Any]]) -> Dashboard:
 
     stats = {
         "num_runs": len(results),
-        "mean_repair_time": statistics.mean(completion_times) if completion_times else 0,
+        "mean_repair_time": (
+            statistics.mean(completion_times) if completion_times else 0
+        ),
         "std_repair_time": (
-            statistics.stdev(completion_times)
-            if len(completion_times) > 1
-            else 0
+            statistics.stdev(completion_times) if len(completion_times) > 1 else 0
         ),
         "min_repair_time": min(completion_times) if completion_times else 0,
         "max_repair_time": max(completion_times) if completion_times else 0,
