@@ -1,0 +1,4 @@
+# file: /Users/vorthruna/ProjectsWATTS/happygene/happygene/analysis/morris.py
+# hypothesis_version: 6.150.2
+
+[0.0, 0.1, 0.5, 0.95, 1.0, 'Important', 'Insignificant', 'Interaction', 'bounds', 'classification', 'min', 'mu', 'mu_star', 'names', 'num_vars', 'param', 'rank', 'sigma', 'survival']
