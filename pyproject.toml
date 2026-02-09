@@ -37,6 +37,7 @@ dev = [
     "isort>=5.13",
     "coverage>=7.0",
     "hypothesis>=6.0",
+    "pytest-benchmark>=4.0",
 ]
 io = [
     "pydantic>=2.0",
