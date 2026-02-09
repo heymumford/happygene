@@ -87,3 +87,55 @@ class ConstantExpression(ExpressionModel):
 
     def __repr__(self) -> str:
         return f"ConstantExpression(level={self.level})"
+
+
+class HillExpression(ExpressionModel):
+    """Hill expression model: sigmoidal response via Hill equation.
+
+    Models gene regulation with cooperative binding using the Hill equation:
+    E = v_max * (tf^n) / (k^n + tf^n)
+
+    Parameters
+    ----------
+    v_max : float
+        Maximum expression level. Must be >= 0.
+    k : float
+        Half-saturation coefficient (tf at 50% response). Must be > 0.
+    n : float
+        Hill coefficient (cooperativity). Must be > 0.
+        n=1: Michaelis-Menten kinetics
+        n>1: Positive cooperativity (switch-like)
+
+    Raises
+    ------
+    ValueError
+        If v_max < 0, k <= 0, or n <= 0.
+    """
+
+    def __init__(self, v_max: float, k: float, n: float):
+        if v_max < 0.0:
+            raise ValueError(f"v_max must be >= 0, got {v_max}")
+        if k <= 0.0:
+            raise ValueError(f"k must be > 0, got {k}")
+        if n <= 0.0:
+            raise ValueError(f"n must be > 0, got {n}")
+
+        self.v_max: float = v_max
+        self.k: float = k
+        self.n: float = n
+
+    def compute(self, conditions: Conditions) -> float:
+        """Compute Hill equation response.
+
+        E = v_max * (tf^n) / (k^n + tf^n)
+
+        Result is always in range [0, v_max].
+        """
+        tf = conditions.tf_concentration
+        tf_power = tf ** self.n
+        k_power = self.k ** self.n
+        result = self.v_max * tf_power / (k_power + tf_power)
+        return max(0.0, result)
+
+    def __repr__(self) -> str:
+        return f"HillExpression(v_max={self.v_max}, k={self.k}, n={self.n})"

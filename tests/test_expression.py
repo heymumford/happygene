@@ -1,7 +1,7 @@
 """Tests for expression models and conditions."""
 import pytest
 from happygene.conditions import Conditions
-from happygene.expression import ExpressionModel, LinearExpression, ConstantExpression
+from happygene.expression import ExpressionModel, LinearExpression, ConstantExpression, HillExpression
 
 
 class TestConditions:
@@ -139,3 +139,74 @@ class TestConstantExpression:
         repr_str = repr(expr)
         assert "ConstantExpression" in repr_str
         assert "5.0" in repr_str
+
+
+class TestHillExpression:
+    """Tests for HillExpression model (Hill equation)."""
+
+    def test_hill_expression_creation(self):
+        """HillExpression can be created with valid parameters."""
+        expr = HillExpression(v_max=10.0, k=2.0, n=2.0)
+        assert expr.v_max == 10.0
+        assert expr.k == 2.0
+        assert expr.n == 2.0
+
+    def test_hill_expression_zero_tf_gives_zero(self):
+        """HillExpression at tf=0 returns 0."""
+        expr = HillExpression(v_max=10.0, k=2.0, n=2.0)
+        cond = Conditions(tf_concentration=0.0)
+        result = expr.compute(cond)
+        assert result == 0.0
+
+    def test_hill_expression_saturates_at_vmax(self):
+        """HillExpression saturates at v_max for high tf."""
+        expr = HillExpression(v_max=10.0, k=2.0, n=2.0)
+        cond = Conditions(tf_concentration=100.0)
+        result = expr.compute(cond)
+        # Should be very close to v_max
+        assert result > 9.9
+
+    def test_hill_expression_half_saturation_at_k(self):
+        """HillExpression at tf=k returns approximately 0.5*v_max."""
+        expr = HillExpression(v_max=10.0, k=2.0, n=2.0)
+        cond = Conditions(tf_concentration=2.0)
+        result = expr.compute(cond)
+        # At tf=k: result = v_max * (k^n) / (k^n + k^n) = v_max / 2
+        assert abs(result - 5.0) < 0.01
+
+    def test_hill_expression_cooperativity(self):
+        """HillExpression with n=4 is more switch-like than n=1."""
+        expr_steep = HillExpression(v_max=10.0, k=2.0, n=4.0)
+        expr_linear = HillExpression(v_max=10.0, k=2.0, n=1.0)
+        cond = Conditions(tf_concentration=1.0)
+
+        result_steep = expr_steep.compute(cond)
+        result_linear = expr_linear.compute(cond)
+
+        # At tf=1 (below k=2), steeper curve should give lower value
+        assert result_steep < result_linear
+
+    def test_hill_expression_k_must_be_positive(self):
+        """HillExpression rejects k <= 0."""
+        with pytest.raises(ValueError):
+            HillExpression(v_max=10.0, k=0.0, n=2.0)
+        with pytest.raises(ValueError):
+            HillExpression(v_max=10.0, k=-1.0, n=2.0)
+
+    def test_hill_expression_n_must_be_positive(self):
+        """HillExpression rejects n <= 0."""
+        with pytest.raises(ValueError):
+            HillExpression(v_max=10.0, k=2.0, n=0.0)
+        with pytest.raises(ValueError):
+            HillExpression(v_max=10.0, k=2.0, n=-1.0)
+
+    def test_hill_expression_vmax_nonnegative(self):
+        """HillExpression rejects v_max < 0."""
+        with pytest.raises(ValueError):
+            HillExpression(v_max=-1.0, k=2.0, n=2.0)
+
+    def test_hill_expression_repr(self):
+        """HillExpression has informative repr."""
+        expr = HillExpression(v_max=10.0, k=2.0, n=2.0)
+        repr_str = repr(expr)
+        assert "HillExpression" in repr_str
