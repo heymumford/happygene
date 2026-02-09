@@ -1,12 +1,15 @@
 """
-Configuration Loaders - RED Phase Placeholder
+Configuration Loaders - GREEN Phase Implementation
 
-Loads HappyGeneConfig from YAML or JSON files.
-Implementation will be done in GREEN phase.
+Loads HappyGeneConfig from YAML or JSON files with validation.
 """
 
+import json
 from pathlib import Path
-from typing import Union
+from typing import Any, Dict, Union
+
+import yaml
+from pydantic import ValidationError
 
 from engine.domain.config import HappyGeneConfig
 
@@ -27,7 +30,21 @@ def load_config_from_file(config_path: Union[str, Path]) -> HappyGeneConfig:
         FileNotFoundError: If file doesn't exist
         ValueError: If format unsupported or file invalid
     """
-    raise NotImplementedError("load_config_from_file not yet implemented")
+    config_path = Path(config_path)
+
+    if not config_path.exists():
+        raise FileNotFoundError(f"Configuration file not found: {config_path}")
+
+    suffix = config_path.suffix.lower()
+
+    if suffix == ".yaml" or suffix == ".yml":
+        return load_config_from_yaml(config_path)
+    elif suffix == ".json":
+        return load_config_from_json(config_path)
+    else:
+        raise ValueError(
+            f"Unsupported format: {suffix}. Supported formats: .yaml, .json"
+        )
 
 
 def load_config_from_yaml(yaml_path: Union[str, Path]) -> HappyGeneConfig:
@@ -44,7 +61,24 @@ def load_config_from_yaml(yaml_path: Union[str, Path]) -> HappyGeneConfig:
         FileNotFoundError: If file doesn't exist
         ValueError: If YAML invalid or validation fails
     """
-    raise NotImplementedError("load_config_from_yaml not yet implemented")
+    yaml_path = Path(yaml_path)
+
+    if not yaml_path.exists():
+        raise FileNotFoundError(f"YAML file not found: {yaml_path}")
+
+    try:
+        with open(yaml_path) as f:
+            config_dict: Dict[str, Any] = yaml.safe_load(f)
+
+        if config_dict is None:
+            config_dict = {}
+
+        return HappyGeneConfig(**config_dict)
+
+    except yaml.YAMLError as e:
+        raise ValueError(f"Invalid YAML syntax: {e}") from e
+    except ValidationError as e:
+        raise ValueError(f"Configuration validation failed: {e}") from e
 
 
 def load_config_from_json(json_path: Union[str, Path]) -> HappyGeneConfig:
@@ -61,4 +95,18 @@ def load_config_from_json(json_path: Union[str, Path]) -> HappyGeneConfig:
         FileNotFoundError: If file doesn't exist
         ValueError: If JSON invalid or validation fails
     """
-    raise NotImplementedError("load_config_from_json not yet implemented")
+    json_path = Path(json_path)
+
+    if not json_path.exists():
+        raise FileNotFoundError(f"JSON file not found: {json_path}")
+
+    try:
+        with open(json_path) as f:
+            config_dict: Dict[str, Any] = json.load(f)
+
+        return HappyGeneConfig(**config_dict)
+
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON syntax: {e}") from e
+    except ValidationError as e:
+        raise ValueError(f"Configuration validation failed: {e}") from e
