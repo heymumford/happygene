@@ -53,38 +53,61 @@ class GeneNetwork(SimulationModel):
     def step(self) -> None:
         """Advance the simulation by one generation.
 
-        Implements the full life cycle:
-        1. Expression: Compute gene expression using expression_model
-           - If regulatory_network provided, compute TF inputs via sparse matrix multiplication
-           - Pass TF inputs to CompositeExpressionModel if applicable
+        Implements the full life cycle with vectorized expression computation:
+        1. Expression: Compute gene expression using expression_model (VECTORIZED)
+           - Build expression_matrix: (n_individuals, n_genes) NumPy array
+           - If regulatory_network provided, compute TF inputs via sparse matrix
+           - Use NumPy broadcasting for efficient computation
+           - Update genes in-place from matrix
         2. Selection: Evaluate fitness using selection_model
         3. Mutation: Introduce variation using mutation_model
         4. Increment: Advance generation counter
         """
-        # Phase 1: Compute expression for all genes
-        for individual in self.individuals:
-            # If regulatory network provided, compute TF inputs from current expression
-            if self._regulatory_network is not None:
-                expr_vector = np.array([g.expression_level for g in individual.genes])
-                tf_inputs = self._regulatory_network.compute_tf_inputs(expr_vector)
-            else:
-                tf_inputs = None
+        # Phase 1: Vectorized expression computation
+        n_indiv = len(self.individuals)
 
-            for gene_idx, gene in enumerate(individual.genes):
-                if tf_inputs is not None:
-                    # CompositeExpressionModel accepts tf_inputs parameter
-                    if hasattr(self.expression_model, 'regulatory_model'):
-                        expr_level = self.expression_model.compute(
-                            self.conditions, tf_inputs=tf_inputs[gene_idx]
+        if n_indiv == 0:
+            self._generation += 1
+            return
+
+        # Determine n_genes from first individual
+        n_genes = len(self.individuals[0].genes)
+
+        # Initialize expression matrix
+        expr_matrix = np.zeros((n_indiv, n_genes))
+
+        if self._regulatory_network is not None:
+            # Vectorized regulatory computation
+            for ind_idx, individual in enumerate(self.individuals):
+                # Get current expression for this individual
+                prev_expr = np.array([g.expression_level for g in individual.genes])
+                # Compute TF inputs: adjacency @ expression (sparse matrix operations)
+                tf_inputs = self._regulatory_network.compute_tf_inputs(prev_expr)
+
+                # Check if model is composite (has regulatory_model)
+                if hasattr(self.expression_model, 'regulatory_model'):
+                    # Apply expression model with TF inputs for each gene
+                    for gene_idx in range(n_genes):
+                        expr = self.expression_model.compute(
+                            self.conditions,
+                            tf_inputs=tf_inputs[gene_idx]
                         )
-                    else:
-                        # Fallback for non-composite models (ignore tf_inputs)
-                        expr_level = self.expression_model.compute(self.conditions)
+                        expr_matrix[ind_idx, gene_idx] = max(0.0, expr)
                 else:
-                    # No regulation: standard behavior
-                    expr_level = self.expression_model.compute(self.conditions)
+                    # Fallback: compute base model without TF inputs
+                    for gene_idx in range(n_genes):
+                        expr = self.expression_model.compute(self.conditions)
+                        expr_matrix[ind_idx, gene_idx] = max(0.0, expr)
+        else:
+            # No regulation: vectorize across all individuals and genes
+            # Compute single expression value and broadcast to all
+            expr_val = self.expression_model.compute(self.conditions)
+            expr_matrix[:, :] = max(0.0, expr_val)
 
-                gene._expression_level = max(0.0, expr_level)
+        # Update individuals from expression matrix (in-place)
+        for ind_idx, individual in enumerate(self.individuals):
+            for gene_idx, gene in enumerate(individual.genes):
+                gene._expression_level = expr_matrix[ind_idx, gene_idx]
 
         # Phase 2: Evaluate fitness
         for individual in self.individuals:

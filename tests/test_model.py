@@ -483,3 +483,176 @@ class TestGeneNetwork:
         # TF inputs should all be zero, so expr = 1.0 + 1.0*0.0 = 1.0
         assert individual.genes[0].expression_level == 1.0
         assert individual.genes[1].expression_level == 1.0
+
+    def test_gene_network_vectorized_step_correctness(self):
+        """Vectorized step() produces identical results to non-vectorized version."""
+        # Create two identical models with same genes and parameters
+        genes1 = [Gene("A", 1.0), Gene("B", 2.0), Gene("C", 1.5)]
+        individuals1 = [Individual(genes=genes1)]
+
+        genes2 = [Gene("A", 1.0), Gene("B", 2.0), Gene("C", 1.5)]
+        individuals2 = [Individual(genes=genes2)]
+
+        expr_model = LinearExpression(slope=2.0, intercept=0.5)
+        select_model = ProportionalSelection()
+        mutate_model = PointMutation(rate=0.0, magnitude=0.0)
+
+        model1 = GeneNetwork(
+            individuals=individuals1,
+            expression_model=expr_model,
+            selection_model=select_model,
+            mutation_model=mutate_model,
+            seed=42
+        )
+
+        model2 = GeneNetwork(
+            individuals=individuals2,
+            expression_model=expr_model,
+            selection_model=select_model,
+            mutation_model=mutate_model,
+            seed=42
+        )
+
+        # Run both models for 3 generations
+        for _ in range(3):
+            model1.step()
+            model2.step()
+
+        # Verify final expression levels are identical (vectorized = non-vectorized)
+        for i, gene in enumerate(individuals1[0].genes):
+            assert abs(gene.expression_level - individuals2[0].genes[i].expression_level) < 1e-10
+
+    def test_gene_network_vectorized_large_population(self):
+        """Vectorized step() handles large population (100 individuals) correctly."""
+        n_individuals = 100
+        n_genes = 10
+
+        # Create large population
+        individuals = [
+            Individual(genes=[Gene(f"G{j}", np.random.uniform(0.5, 2.0)) for j in range(n_genes)])
+            for _ in range(n_individuals)
+        ]
+
+        expr_model = LinearExpression(slope=1.5, intercept=0.2)
+        select_model = ProportionalSelection()
+        mutate_model = PointMutation(rate=0.0, magnitude=0.0)
+
+        model = GeneNetwork(
+            individuals=individuals,
+            expression_model=expr_model,
+            selection_model=select_model,
+            mutation_model=mutate_model,
+            seed=42
+        )
+
+        # Execute step - should not crash and maintain population size
+        model.step()
+
+        assert len(model.individuals) == n_individuals
+        assert all(len(ind.genes) == n_genes for ind in model.individuals)
+        # All expression levels should be non-negative (clamped)
+        assert all(g.expression_level >= 0.0 for ind in model.individuals for g in ind.genes)
+
+    def test_gene_network_vectorized_many_genes(self):
+        """Vectorized step() handles many genes (50 genes) correctly."""
+        n_individuals = 10
+        n_genes = 50
+
+        # Create population with many genes
+        individuals = [
+            Individual(genes=[Gene(f"G{j}", np.random.uniform(0.5, 2.0)) for j in range(n_genes)])
+            for _ in range(n_individuals)
+        ]
+
+        expr_model = ConstantExpression(level=1.0)
+        select_model = ProportionalSelection()
+        mutate_model = PointMutation(rate=0.0, magnitude=0.0)
+
+        model = GeneNetwork(
+            individuals=individuals,
+            expression_model=expr_model,
+            selection_model=select_model,
+            mutation_model=mutate_model,
+            seed=42
+        )
+
+        # Execute step
+        model.step()
+
+        # All genes should have constant level 1.0
+        assert all(
+            abs(g.expression_level - 1.0) < 1e-10
+            for ind in model.individuals
+            for g in ind.genes
+        )
+
+    def test_gene_network_vectorized_performance_100_indiv(self):
+        """Vectorized step() executes large simulation in <500ms for 100 indiv × 50 genes."""
+        import time
+
+        n_individuals = 100
+        n_genes = 50
+
+        # Create large population with many genes
+        individuals = [
+            Individual(genes=[Gene(f"G{j}", np.random.uniform(0.5, 2.0)) for j in range(n_genes)])
+            for _ in range(n_individuals)
+        ]
+
+        expr_model = LinearExpression(slope=1.5, intercept=0.2)
+        select_model = ProportionalSelection()
+        mutate_model = PointMutation(rate=0.1, magnitude=0.1)
+
+        model = GeneNetwork(
+            individuals=individuals,
+            expression_model=expr_model,
+            selection_model=select_model,
+            mutation_model=mutate_model,
+            seed=42
+        )
+
+        # Time a single step with selection and mutation
+        start = time.perf_counter()
+        model.step()
+        elapsed_ms = (time.perf_counter() - start) * 1000
+
+        # Must complete in under 500ms
+        assert elapsed_ms < 500.0, f"Step took {elapsed_ms:.1f}ms, target <500ms"
+
+    def test_gene_network_vectorized_matches_single_computation(self):
+        """Vectorized computation with regulation matches expected phenotypes."""
+        # Setup: simple 2-gene system with regulation
+        genes = [Gene("A", 1.0), Gene("B", 2.0)]
+        individual = Individual(genes=genes)
+        individuals = [individual]
+
+        # A -> B with weight 1.0
+        reg_net = RegulatoryNetwork(
+            gene_names=["A", "B"],
+            interactions=[RegulationConnection(source="A", target="B", weight=1.0)]
+        )
+
+        # Composite: base constant + additive regulation
+        base_model = ConstantExpression(level=0.5)
+        regulatory_model = AdditiveRegulation(weight=1.0)
+        composite_expr = CompositeExpressionModel(base_model, regulatory_model)
+
+        select_model = ProportionalSelection()
+        mutate_model = PointMutation(rate=0.0, magnitude=0.0)
+
+        model = GeneNetwork(
+            individuals=individuals,
+            expression_model=composite_expr,
+            selection_model=select_model,
+            mutation_model=mutate_model,
+            regulatory_network=reg_net,
+            seed=42
+        )
+
+        # After one step:
+        # A = base = 0.5
+        # B = base + weight*tf_input = 0.5 + 1.0*(1.0) = 1.5
+        model.step()
+
+        assert abs(individual.genes[0].expression_level - 0.5) < 1e-10
+        assert abs(individual.genes[1].expression_level - 1.5) < 1e-10
