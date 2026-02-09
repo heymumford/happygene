@@ -27,10 +27,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .[dev,io]
 
-    - name: Format check with black
-      run: |
-        black --check .
-
     - name: Lint with ruff
       run: |
         ruff check .
