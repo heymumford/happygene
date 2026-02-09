@@ -10,6 +10,32 @@ Produces:
 - σ (std dev of effect): Parameter interaction
 - μ* (mean absolute effect): Robustness to parameter range
 - Parameter classification: Important, Interaction, Insignificant
+
+Example
+-------
+>>> import numpy as np
+>>> import pandas as pd
+>>> from happygene.analysis.batch import BatchSimulator
+>>> from happygene.analysis.morris import MorrisAnalyzer
+>>>
+>>> # Create simulator with 5 parameters
+>>> param_space = {'p0': (0.01, 0.99), 'p1': (0.01, 0.99),
+...                 'p2': (0.01, 0.99), 'p3': (0.01, 0.99),
+...                 'p4': (0.1, 10.0)}
+>>> batch = BatchSimulator(param_space, 'DummyModel')
+>>>
+>>> # Generate and run 120 Morris samples (20 trajectories)
+>>> samples = batch.generate_samples('morris', 20)
+>>> results = batch.run_batch(samples, generations=100, seed=42)
+>>>
+>>> # Analyze with Morris indices
+>>> analyzer = MorrisAnalyzer(list(param_space.keys()))
+>>> indices = analyzer.analyze(results, output_col='survival')
+>>>
+>>> # Classify parameters by sensitivity type
+>>> classified = analyzer.classify_parameters(indices)
+>>> print(f"Important parameters: {classified['Important']}")  # doctest: +SKIP
+Important parameters: ['p0']
 """
 
 import numpy as np
@@ -149,7 +175,7 @@ class MorrisAnalyzer:
         }
 
         # Compute Morris indices
-        Si = morris_analyze(problem, X, Y, conf_level=0.95, seed=42)
+        Si = morris_analyze.analyze(problem, X, Y, conf_level=0.95, seed=42)
 
         # Extract indices
         indices = MorrisIndices(

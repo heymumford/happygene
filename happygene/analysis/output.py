@@ -9,6 +9,27 @@ Generates:
 - CSV/JSON export for external tools
 
 All plots are publication-ready with professional styling.
+
+Example
+-------
+>>> import tempfile
+>>> import numpy as np
+>>> import pandas as pd
+>>> from pathlib import Path
+>>> from happygene.analysis.output import OutputExporter
+>>>
+>>> # Create temporary output directory
+>>> with tempfile.TemporaryDirectory() as tmpdir:
+...     exporter = OutputExporter(tmpdir)
+...
+...     # Export Sobol indices
+...     sobol_data = pd.DataFrame({
+...         'param': ['p0', 'p1', 'p2'],
+...         'ST': [0.5, 0.3, 0.2]
+...     })
+...     csv_path = exporter.export_indices_to_csv(sobol_data)
+...     print(f"Exported: {csv_path.name}")  # doctest: +SKIP
+Exported: sobol_indices.csv
 """
 
 import json

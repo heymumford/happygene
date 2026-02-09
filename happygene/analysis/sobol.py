@@ -8,6 +8,32 @@ Produces:
 - Sobol indices with confidence intervals
 - Parameter rankings (main effect, total effect, interaction)
 - Convergence diagnostics
+
+Example
+-------
+>>> import numpy as np
+>>> import pandas as pd
+>>> from happygene.analysis.batch import BatchSimulator
+>>> from happygene.analysis.sobol import SobolAnalyzer
+>>>
+>>> # Create simulator with 5 parameters
+>>> param_space = {'p0': (0.01, 0.99), 'p1': (0.01, 0.99),
+...                 'p2': (0.01, 0.99), 'p3': (0.01, 0.99),
+...                 'p4': (0.1, 10.0)}
+>>> batch = BatchSimulator(param_space, 'DummyModel')
+>>>
+>>> # Generate and run 768 Sobol samples (Saltelli scheme)
+>>> samples = batch.generate_samples('saltelli', 64)
+>>> results = batch.run_batch(samples, generations=100, seed=42)
+>>>
+>>> # Analyze with Sobol indices
+>>> analyzer = SobolAnalyzer(list(param_space.keys()))
+>>> indices = analyzer.analyze(results, output_col='survival')
+>>>
+>>> # Rank parameters by total effect (ST)
+>>> ranked = analyzer.rank_parameters(indices, by='ST')
+>>> print(f"Most important parameter: {ranked.iloc[0]['param']}")  # doctest: +SKIP
+Most important parameter: p0
 """
 
 import numpy as np
@@ -146,7 +172,7 @@ class SobolAnalyzer:
         }
 
         # Compute Sobol indices
-        Si = sobol_analyze(
+        Si = sobol_analyze.analyze(
             problem, Y, calc_second_order=calc_second_order, seed=42, conf_level=0.95
         )
 

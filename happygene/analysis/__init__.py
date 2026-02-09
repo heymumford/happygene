@@ -35,6 +35,9 @@ Modules
 from .batch import BatchSimulator
 from .sobol import SobolAnalyzer, SobolIndices
 from .morris import MorrisAnalyzer, MorrisIndices
+from .correlation import CorrelationAnalyzer
+from .response import ResponseSurfaceModel
+from .output import OutputExporter
 
 __all__ = [
     "BatchSimulator",
@@ -42,4 +45,7 @@ __all__ = [
     "SobolIndices",
     "MorrisAnalyzer",
     "MorrisIndices",
+    "CorrelationAnalyzer",
+    "ResponseSurfaceModel",
+    "OutputExporter",
 ]
