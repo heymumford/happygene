@@ -36,6 +36,7 @@ dev = [
     "black>=24.0",
     "isort>=5.13",
     "coverage>=7.0",
+    "hypothesis>=6.0",
 ]
 io = [
     "pydantic>=2.0",
