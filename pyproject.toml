@@ -106,10 +106,9 @@ python_files = ["test_*.py"]
 addopts = """
     -v
     --strict-markers
-    --cov=happygene
-    --cov-report=term-plus
+    --cov=engine
+    --cov-report=term-missing
     --cov-report=html
-    --cov-report=xml
     --cov-fail-under=75
 """
 markers = [
