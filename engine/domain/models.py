@@ -130,7 +130,12 @@ class DamageProfile:
                 )
 
     def lesion_count(self) -> int:
-        """Total lesions in this profile."""
+        """
+        Total lesions in this damage profile.
+
+        Returns:
+            Count of lesions (0 if no damage).
+        """
         return len(self.lesions)
 
 
@@ -163,7 +168,12 @@ class RepairEvent:
 
     @property
     def duration_seconds(self) -> float:
-        """Repair duration."""
+        """
+        Repair event duration (end_time - start_time).
+
+        Returns:
+            Duration in seconds (≥ 0).
+        """
         return self.end_time - self.start_time
 
 
@@ -209,7 +219,13 @@ class RepairOutcome:
             raise ValueError(f"success=True but unrepaired lesions remain")
 
     def outcome_summary(self) -> dict:
-        """Repair outcome as dict (for logging/serialization)."""
+        """
+        Repair outcome as dict (for logging/serialization).
+
+        Returns:
+            Dict with keys: initial_lesions, repaired, unrepaired, success,
+            events, time_seconds, rmse.
+        """
         return {
             "initial_lesions": self.initial_lesions,
             "repaired": self.total_repaired,
@@ -272,24 +288,45 @@ class PopulationOutcome:
 
     @property
     def survival_rate(self) -> float:
-        """Fraction of cells surviving (viable)."""
+        """
+        Fraction of cells surviving (viable).
+
+        Returns:
+            Value in [0, 1] representing survival rate.
+        """
         viable = sum(1 for fate in self.cell_fates if fate.status == CellFateStatus.VIABLE)
         return viable / len(self.cell_fates) if self.cell_fates else 0.0
 
     @property
     def apoptosis_rate(self) -> float:
-        """Fraction of cells undergoing apoptosis."""
+        """
+        Fraction of cells undergoing apoptosis.
+
+        Returns:
+            Value in [0, 1] representing apoptosis rate.
+        """
         apoptotic = sum(1 for fate in self.cell_fates if fate.status == CellFateStatus.APOPTOSIS)
         return apoptotic / len(self.cell_fates) if self.cell_fates else 0.0
 
     @property
     def senescence_rate(self) -> float:
-        """Fraction of cells senescing."""
+        """
+        Fraction of cells senescing.
+
+        Returns:
+            Value in [0, 1] representing senescence rate.
+        """
         senescent = sum(1 for fate in self.cell_fates if fate.status == CellFateStatus.SENESCENCE)
         return senescent / len(self.cell_fates) if self.cell_fates else 0.0
 
     def summary(self) -> dict:
-        """Population outcome as dict (for logging/export)."""
+        """
+        Population outcome as dict (for logging/export).
+
+        Returns:
+            Dict with keys: dose_gy, population_size, survival_rate,
+            apoptosis_rate, senescence_rate, elapsed_time, seed.
+        """
         return {
             "dose_gy": self.damage_profile.dose_gy,
             "population_size": self.damage_profile.population_size,

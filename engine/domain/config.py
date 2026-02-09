@@ -7,7 +7,7 @@ Ensures configuration is valid before simulation starts.
 Principle: All user input validated at boundaries. Clear error messages.
 """
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 from typing import List, Optional, Dict, Any
 from enum import Enum
 
@@ -43,7 +43,14 @@ class KineticsConfig(BaseModel):
     - atol=1e-9: Absolute tolerance (for near-zero values)
 
     Publication-grade defaults per ADR-001.
+
+    Example:
+        >>> config = KineticsConfig(rtol=1e-6, atol=1e-9)
+        >>> config.method
+        <SolverMethod.BDF: 'BDF'>
     """
+    model_config = ConfigDict(frozen=True)
+
     method: SolverMethod = Field(
         default=SolverMethod.BDF,
         description="ODE solver method (BDF for stiff systems)"
@@ -71,12 +78,9 @@ class KineticsConfig(BaseModel):
         description="Jacobian computation method"
     )
 
-    class Config:
-        frozen = True  # Make config immutable after creation
-
     @field_validator("rtol", "atol")
     @classmethod
-    def validate_tolerances(cls, v, info):
+    def validate_tolerances(cls, v: float, info) -> float:
         """Ensure rtol >= atol (relative >= absolute)."""
         if "atol" in info.data and v < info.data.get("atol", 0):
             raise ValueError(f"{info.field_name} must be >= atol")
@@ -84,7 +88,15 @@ class KineticsConfig(BaseModel):
 
 
 class RepairPathwayConfig(BaseModel):
-    """Configuration for individual repair pathway."""
+    """
+    Configuration for individual repair pathway.
+
+    Example:
+        >>> config = RepairPathwayConfig(enabled=True, relative_rate=0.8)
+        >>> config.parameters = {"k_on": 0.01}
+    """
+    model_config = ConfigDict(frozen=True)
+
     enabled: bool = Field(default=True, description="Is this pathway active?")
     relative_rate: float = Field(
         default=1.0,
@@ -96,9 +108,6 @@ class RepairPathwayConfig(BaseModel):
         default_factory=dict,
         description="Pathway-specific parameters (k_on, k_off, etc.)"
     )
-
-    class Config:
-        frozen = True
 
 
 class SimulationConfig(BaseModel):
@@ -121,7 +130,13 @@ class SimulationConfig(BaseModel):
           cell_cycle_phase: "G1"
           random_seed: 42
         ```
+
+    Example Python:
+        >>> config = SimulationConfig(dose_gy=4.0, population_size=100)
+        >>> config.dose_gy
+        4.0
     """
+    model_config = ConfigDict(frozen=True)
     type: str = Field(
         default="radiation_dna_repair",
         pattern="^[a-z_]+$",
@@ -162,12 +177,9 @@ class SimulationConfig(BaseModel):
         description="Random seed for reproducibility"
     )
 
-    class Config:
-        frozen = True
-
     @field_validator("repair_pathways")
     @classmethod
-    def validate_pathways(cls, v):
+    def validate_pathways(cls, v: List[RepairPathwayConfig]) -> List[RepairPathwayConfig]:
         """Ensure at least one pathway enabled."""
         if not any(p.enabled for p in v):
             raise ValueError("At least one repair pathway must be enabled")
@@ -175,7 +187,16 @@ class SimulationConfig(BaseModel):
 
 
 class OutputConfig(BaseModel):
-    """Output format and storage configuration."""
+    """
+    Output format and storage configuration.
+
+    Example:
+        >>> config = OutputConfig(format=OutputFormat.SBML, compress=True)
+        >>> config.format
+        <OutputFormat.SBML: 'sbml'>
+    """
+    model_config = ConfigDict(frozen=True)
+
     format: OutputFormat = Field(
         default=OutputFormat.HDF5,
         description="Output serialization format"
@@ -195,16 +216,23 @@ class OutputConfig(BaseModel):
         description="Include config, git commit, seed in output"
     )
 
-    class Config:
-        frozen = True
-
 
 class HappyGeneConfig(BaseModel):
     """
     Root configuration object (entire simulation setup).
 
     Loaded from YAML via: `HappyGeneConfig.from_yaml("config.yaml")`
+
+    Example:
+        >>> config = HappyGeneConfig()
+        >>> config.simulation.dose_gy
+        4.0
+        >>> hash_val = config.config_hash()
+        >>> len(hash_val)
+        16
     """
+    model_config = ConfigDict(frozen=True)
+
     simulation: SimulationConfig = Field(
         default_factory=SimulationConfig,
         description="Simulation parameters"
@@ -218,16 +246,23 @@ class HappyGeneConfig(BaseModel):
         description="Output format"
     )
 
-    class Config:
-        frozen = True
-
     @classmethod
     def from_yaml(cls, path: str) -> "HappyGeneConfig":
-        """Load configuration from YAML file (not implemented yet)."""
-        raise NotImplementedError("YAML loading implemented in Phase 2")
+        """
+        Load configuration from YAML file (not implemented yet).
+
+        Raises:
+            NotImplementedError: Implementation deferred to Phase 5.
+        """
+        raise NotImplementedError("YAML loading implemented in Phase 5")
 
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to nested dict (for serialization)."""
+        """
+        Convert to nested dict (for serialization).
+
+        Returns:
+            Dict with keys: simulation, kinetics, output.
+        """
         return self.model_dump()
 
     def config_hash(self) -> str:
@@ -235,6 +270,10 @@ class HappyGeneConfig(BaseModel):
         Compute stable config hash (reproducibility, caching).
 
         Same input → same hash (deterministic).
+        Uses SHA256, returns 16-char hex (64-bit).
+
+        Returns:
+            16-character hex string (lowercase).
         """
         import hashlib
         import json
