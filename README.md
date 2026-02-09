@@ -1,9 +1,10 @@
 # happygene
 
 [![Tests](https://github.com/heymumford/happygene/actions/workflows/test.yml/badge.svg)](https://github.com/heymumford/happygene/actions/workflows/test.yml)
-[![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](https://github.com/heymumford/happygene)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
+[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://github.com/heymumford/happygene)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/)
+[![Version 0.2.0](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/heymumford/happygene/releases)
 
 A Python-based framework for simulating gene network evolution with selection, mutation, and expression dynamics.
 
@@ -76,18 +77,23 @@ For more examples, see `examples/simple_duplication.py` and `examples/regulatory
 
 - **Python-first**: Pure Python (no C++ dependencies) for accessibility and extensibility
 - **Modular architecture**: Subclass `ExpressionModel`, `SelectionModel`, or `MutationModel` to add custom behavior
-- **Realistic gene dynamics**: Hill kinetics for sigmoidal responses, proportional/threshold selection, point mutations
+- **Realistic gene dynamics**: Hill kinetics for sigmoidal responses, proportional/threshold/epistatic selection, point mutations
+- **Gene Regulatory Networks** (v0.2.0+): Sparse adjacency matrices for multi-gene interactions with circuit detection
+- **Composite Expression Models**: Base + regulatory overlay composition pattern for flexible gene regulation
+- **Advanced Selection**: Sexual/asexual reproduction, epistatic fitness, multi-objective optimization
 - **Multi-level data collection**: Track model (generation), individual (fitness), and gene (expression) metrics
 - **Fast**: Simulates 1k generations × 100 individuals × 50 genes in <500ms
 - **Reproducible**: Set seed for deterministic results across runs
-- **Well-tested**: 110+ tests with 97% coverage
-- **Documented**: Sphinx documentation with tutorials and API reference
+- **Well-tested**: 200+ tests with 95%+ coverage (Phase 2)
+- **Documented**: Comprehensive guides with tutorials and API reference
 
 ## Requirements
 
 - **Python 3.12+** (3.13 supported)
 - **numpy** >= 1.26
 - **pandas** >= 2.0
+- **scipy** >= 1.10 (sparse matrices for regulatory networks)
+- **networkx** >= 3.0 (circuit detection)
 
 **Optional dependencies:**
 - **pytest** (for testing) — install with `pip install happygene[dev]`
@@ -101,17 +107,27 @@ For more examples, see `examples/simple_duplication.py` and `examples/regulatory
 - **Population**: List of individuals in simulation
 
 ### Models
-- **ExpressionModel**: Computes gene expression level given conditions
-  - `ConstantExpression`: Fixed level
-  - `LinearExpression`: Linear response to transcription factor
-  - `HillExpression`: Sigmoidal response with cooperative binding
 
-- **SelectionModel**: Computes individual fitness
-  - `ProportionalSelection`: Fitness = mean gene expression
-  - `ThresholdSelection`: Binary fitness based on threshold
+**Expression Models**: Compute gene expression level given conditions
+- `ConstantExpression`: Fixed level
+- `LinearExpression`: Linear response to transcription factor
+- `HillExpression`: Sigmoidal response with cooperative binding
+- `CompositeExpressionModel` (v0.2.0+): Base + regulatory overlay with `AdditiveRegulation` or `MultiplicativeRegulation`
 
-- **MutationModel**: Introduces genetic variation
-  - `PointMutation`: Random changes with configurable rate and magnitude
+**Selection Models**: Compute individual fitness
+- `ProportionalSelection`: Fitness = mean gene expression
+- `ThresholdSelection`: Binary fitness based on threshold
+- `EpistaticFitness` (v0.2.0+): Fitness with gene-gene interaction effects
+- `MultiObjectiveSelection` (v0.2.0+): Weighted multi-objective fitness aggregation
+- `SexualReproduction` (v0.2.0+): Genetic crossover between parents
+- `AsexualReproduction` (v0.2.0+): Cloning-based reproduction
+
+**Mutation Models**: Introduce genetic variation
+- `PointMutation`: Random changes with configurable rate and magnitude
+
+**Regulatory Networks** (v0.2.0+):
+- `RegulatoryNetwork`: Sparse gene-to-gene interaction matrix with circuit detection
+- `RegulationConnection`: Individual regulatory edge definition
 
 ### Simulation
 - **GeneNetwork**: Main model coordinating expression → selection → mutation each generation

@@ -1,5 +1,5 @@
 """HappyGene: Gene network evolution simulation framework."""
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from happygene.base import SimulationModel
 from happygene.conditions import Conditions
