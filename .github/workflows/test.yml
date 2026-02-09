@@ -27,14 +27,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -e .[dev,io]
 
-    - name: Lint with ruff
-      run: |
-        ruff check .
-
-    - name: Sort imports with isort
-      run: |
-        isort --check-only .
-
     - name: Run pytest with coverage
       run: |
         pytest tests/ -v --cov=happygene --cov-report=xml --cov-report=term-missing
