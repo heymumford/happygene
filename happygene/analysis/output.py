@@ -172,7 +172,9 @@ class OutputExporter:
         exports = {}
 
         # Export batch results
-        exports["batch_results"] = self.export_batch_results_to_csv(batch_results, f"{name}_batch_results")
+        exports["batch_results"] = self.export_batch_results_to_csv(
+            batch_results, f"{name}_batch_results"
+        )
 
         # Export indices
         for analysis_name, indices_df in indices_data.items():

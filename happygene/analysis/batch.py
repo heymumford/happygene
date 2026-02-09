@@ -211,11 +211,12 @@ class BatchSimulator:
         results_df = pd.DataFrame(results_list)
 
         # Reorder columns: params first, then outputs, then metadata
-        output_cols = set(results_df.columns) - set(self.param_names) - {"run_id", "seed", "timestamp"}
+        metadata_cols = {"run_id", "seed", "timestamp"}
+        output_cols = set(results_df.columns) - set(self.param_names) - metadata_cols
         column_order = (
             self.param_names
             + sorted(list(output_cols))
-            + ["run_id", "seed", "timestamp"]
+            + list(metadata_cols)
         )
         results_df = results_df[column_order]
 
@@ -257,8 +258,16 @@ class BatchSimulator:
             repair_time = 5.0 + 10.0 * dose_gy + rng.normal(0, 2.0)
 
             # Survival depends on dose and repair rate
-            repair_rate = getattr(kinetics, 'repair_rate', 0.05) if kinetics else 0.05
-            survival = max(0.0, min(1.0, 0.9 - 0.1 * dose_gy + 0.2 * repair_rate + rng.normal(0, 0.05)))
+            repair_rate = (
+                getattr(kinetics, "repair_rate", 0.05)
+                if kinetics
+                else 0.05
+            )
+            noise = rng.normal(0, 0.05)
+            survival = max(0.0, min(
+                1.0,
+                0.9 - 0.1 * dose_gy + 0.2 * repair_rate + noise
+            ))
 
             outputs = {
                 "total_repairs": float(total_repairs),
