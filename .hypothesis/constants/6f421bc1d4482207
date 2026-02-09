@@ -1,0 +1,4 @@
+# file: /Users/vorthruna/ProjectsWATTS/happygene/engine/simulator/batch.py
+# hypothesis_version: 6.150.2
+
+[0.0, 0.9, 'S', 'complete', 'completion_time', 'dose_gy', 'final_repair_count', 'initial_lesion_count', 'max_repair_time', 'mean_repair_count', 'mean_repair_time', 'min_repair_time', 'num_runs', 'population_size', 'r', 'run_id', 'status', 'std_repair_count', 'std_repair_time', 'w']
