@@ -1,7 +1,12 @@
 """Tests for selection models."""
 import pytest
 from happygene.entities import Gene, Individual
-from happygene.selection import SelectionModel, ProportionalSelection, ThresholdSelection
+from happygene.selection import (
+    SelectionModel,
+    ProportionalSelection,
+    ThresholdSelection,
+    SexualReproduction,
+)
 
 
 class TestSelectionModel:
@@ -133,3 +138,83 @@ class TestThresholdSelection:
         repr_str = repr(selector)
         assert "ThresholdSelection" in repr_str
         assert "2.5" in repr_str
+
+
+class TestSexualReproduction:
+    """Tests for SexualReproduction model (crossover + mating)."""
+
+    def test_sexual_reproduction_creation(self):
+        """SexualReproduction can be instantiated with crossover_rate."""
+        selector = SexualReproduction(crossover_rate=0.5)
+        assert selector is not None
+        assert selector.crossover_rate == 0.5
+
+    def test_sexual_reproduction_default_crossover_rate(self):
+        """SexualReproduction defaults to 0.5 crossover rate."""
+        selector = SexualReproduction()
+        assert selector.crossover_rate == 0.5
+
+    def test_sexual_reproduction_crossover_rate_stored(self):
+        """SexualReproduction stores provided crossover_rate."""
+        selector = SexualReproduction(crossover_rate=0.8)
+        assert selector.crossover_rate == 0.8
+
+    def test_sexual_reproduction_mate_produces_offspring(self):
+        """mate() produces offspring with genes from both parents."""
+        selector = SexualReproduction(crossover_rate=0.5)
+        parent1 = Individual([Gene("g1", 1.0), Gene("g2", 2.0)])
+        parent2 = Individual([Gene("g1", 0.5), Gene("g2", 1.5)])
+
+        offspring = selector.mate(parent1, parent2, rng=__import__("numpy").random.default_rng(42))
+
+        # Offspring should have same number of genes as parents
+        assert len(offspring.genes) == 2
+        # Each gene should have a name and expression
+        assert all(gene.name in ["g1", "g2"] for gene in offspring.genes)
+        # Expression levels should be non-negative
+        assert all(gene.expression_level >= 0 for gene in offspring.genes)
+
+    def test_sexual_reproduction_mate_with_zero_crossover(self):
+        """mate() with crossover_rate=0 produces exact copy of parent1."""
+        selector = SexualReproduction(crossover_rate=0.0)
+        parent1 = Individual([Gene("g1", 1.0), Gene("g2", 2.0)])
+        parent2 = Individual([Gene("g1", 0.5), Gene("g2", 1.5)])
+
+        offspring = selector.mate(parent1, parent2, rng=__import__("numpy").random.default_rng(42))
+
+        # With 0 crossover, offspring should match parent1 exactly
+        assert len(offspring.genes) == len(parent1.genes)
+        for i, gene in enumerate(offspring.genes):
+            assert gene.name == parent1.genes[i].name
+            assert gene.expression_level == parent1.genes[i].expression_level
+
+    def test_sexual_reproduction_mate_with_full_crossover(self):
+        """mate() with crossover_rate=1.0 produces combination from both parents."""
+        selector = SexualReproduction(crossover_rate=1.0)
+        parent1 = Individual([Gene("g1", 1.0), Gene("g2", 2.0)])
+        parent2 = Individual([Gene("g1", 0.5), Gene("g2", 1.5)])
+
+        offspring = selector.mate(parent1, parent2, rng=__import__("numpy").random.default_rng(42))
+
+        # With 1.0 crossover, offspring should have genes mixed from both
+        assert len(offspring.genes) == 2
+        # Expression levels should come from either parent (0.5 or 1.0 for g1, 1.5 or 2.0 for g2)
+        assert all(gene.expression_level >= 0 for gene in offspring.genes)
+
+    def test_sexual_reproduction_mate_multiple_genes(self):
+        """mate() handles multiple genes correctly."""
+        selector = SexualReproduction(crossover_rate=0.5)
+        parent1 = Individual([Gene(f"g{i}", float(i + 1)) for i in range(5)])
+        parent2 = Individual([Gene(f"g{i}", float(i + 0.5)) for i in range(5)])
+
+        offspring = selector.mate(parent1, parent2, rng=__import__("numpy").random.default_rng(42))
+
+        assert len(offspring.genes) == 5
+        assert all(offspring.genes[i].name == f"g{i}" for i in range(5))
+
+    def test_sexual_reproduction_repr(self):
+        """SexualReproduction has informative repr."""
+        selector = SexualReproduction(crossover_rate=0.7)
+        repr_str = repr(selector)
+        assert "SexualReproduction" in repr_str
+        assert "0.7" in repr_str

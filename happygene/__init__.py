@@ -23,6 +23,7 @@ from happygene.regulatory_network import RegulationConnection, RegulatoryNetwork
 from happygene.selection import (
     ProportionalSelection,
     SelectionModel,
+    SexualReproduction,
     ThresholdSelection,
 )
 
@@ -43,6 +44,7 @@ __all__ = [
     "SelectionModel",
     "ProportionalSelection",
     "ThresholdSelection",
+    "SexualReproduction",
     "MutationModel",
     "PointMutation",
     "DataCollector",
