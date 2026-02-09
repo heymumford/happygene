@@ -16,6 +16,7 @@ Supports:
 import numpy as np
 import pandas as pd
 from typing import Dict, Optional, Tuple, List
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
 
 
 class ResponseSurfaceModel:
@@ -56,12 +57,11 @@ class ResponseSurfaceModel:
         self
             For method chaining.
         """
-        # Lazy imports to avoid hard dependencies
-        from sklearn.preprocessing import StandardScaler
+        # Import additional sklearn models
         from sklearn.linear_model import LinearRegression
         from sklearn.ensemble import RandomForestRegressor
 
-        # Re-initialize scaler with proper import
+        # Re-initialize scaler for fresh state
         self.scaler = StandardScaler()
 
         # Extract data
@@ -200,7 +200,5 @@ class ResponseSurfaceModel:
         np.ndarray
             Expanded feature matrix with polynomial terms
         """
-        from sklearn.preprocessing import PolynomialFeatures
-
         poly = PolynomialFeatures(degree=degree, include_bias=False)
         return poly.fit_transform(X)
