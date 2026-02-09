@@ -76,6 +76,59 @@ class TestProportionalSelection:
         repr_str = repr(selector)
         assert "ProportionalSelection" in repr_str
 
+    def test_proportional_selection_compute_fitness_batch_single_individual(self):
+        """ProportionalSelection.compute_fitness_batch on single individual."""
+        selector = ProportionalSelection()
+        expr_matrix = np.array([[2.0, 4.0]])
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        # Should be shape (1,) with value [3.0]
+        assert fitness_batch.shape == (1,)
+        assert fitness_batch[0] == 3.0
+
+    def test_proportional_selection_compute_fitness_batch_multiple_individuals(self):
+        """ProportionalSelection.compute_fitness_batch matches per-individual computation."""
+        selector = ProportionalSelection()
+        # 3 individuals, each with 3 genes
+        expr_matrix = np.array([
+            [1.0, 2.0, 3.0],  # mean = 2.0
+            [2.0, 4.0, 6.0],  # mean = 4.0
+            [0.0, 0.0, 1.0],  # mean = 1/3
+        ])
+
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        # Verify shape
+        assert fitness_batch.shape == (3,)
+
+        # Verify values
+        np.testing.assert_allclose(fitness_batch, [2.0, 4.0, 1.0/3.0])
+
+        # Verify batch matches per-individual computation
+        for i in range(3):
+            genes = [Gene(f"g{j}", expr_matrix[i, j]) for j in range(3)]
+            individual = Individual(genes)
+            individual_fitness = selector.compute_fitness(individual)
+            assert individual_fitness == fitness_batch[i]
+
+    def test_proportional_selection_compute_fitness_batch_zero_genes(self):
+        """ProportionalSelection.compute_fitness_batch with empty genes."""
+        selector = ProportionalSelection()
+        expr_matrix = np.array([]).reshape(1, 0)  # 1 individual, 0 genes
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (1,)
+        assert fitness_batch[0] == 0.0  # mean of empty should be 0
+
+    def test_proportional_selection_compute_fitness_batch_all_zeros(self):
+        """ProportionalSelection.compute_fitness_batch with all-zero expressions."""
+        selector = ProportionalSelection()
+        expr_matrix = np.zeros((2, 4))
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (2,)
+        np.testing.assert_array_equal(fitness_batch, [0.0, 0.0])
+
 
 class TestThresholdSelection:
     """Tests for ThresholdSelection model."""
@@ -142,6 +195,61 @@ class TestThresholdSelection:
         repr_str = repr(selector)
         assert "ThresholdSelection" in repr_str
         assert "2.5" in repr_str
+
+    def test_threshold_selection_compute_fitness_batch_single_individual(self):
+        """ThresholdSelection.compute_fitness_batch on single individual."""
+        selector = ThresholdSelection(threshold=3.0)
+        expr_matrix = np.array([[2.0, 4.0]])  # mean = 3.0, at threshold
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (1,)
+        assert fitness_batch[0] == 1.0
+
+    def test_threshold_selection_compute_fitness_batch_multiple_individuals(self):
+        """ThresholdSelection.compute_fitness_batch matches per-individual computation."""
+        selector = ThresholdSelection(threshold=2.5)
+        # 3 individuals with different mean expressions
+        expr_matrix = np.array([
+            [1.0, 2.0, 3.0],  # mean = 2.0, below threshold → 0.0
+            [2.0, 4.0, 3.0],  # mean = 3.0, above threshold → 1.0
+            [2.5, 2.5, 2.5],  # mean = 2.5, at threshold → 1.0
+        ])
+
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (3,)
+        np.testing.assert_array_equal(fitness_batch, [0.0, 1.0, 1.0])
+
+        # Verify batch matches per-individual computation
+        for i in range(3):
+            genes = [Gene(f"g{j}", expr_matrix[i, j]) for j in range(3)]
+            individual = Individual(genes)
+            individual_fitness = selector.compute_fitness(individual)
+            assert individual_fitness == fitness_batch[i]
+
+    def test_threshold_selection_compute_fitness_batch_all_below_threshold(self):
+        """ThresholdSelection.compute_fitness_batch with all below threshold."""
+        selector = ThresholdSelection(threshold=10.0)
+        expr_matrix = np.array([
+            [1.0, 2.0],
+            [3.0, 4.0],
+        ])
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (2,)
+        np.testing.assert_array_equal(fitness_batch, [0.0, 0.0])
+
+    def test_threshold_selection_compute_fitness_batch_all_above_threshold(self):
+        """ThresholdSelection.compute_fitness_batch with all above threshold."""
+        selector = ThresholdSelection(threshold=0.0)
+        expr_matrix = np.array([
+            [1.0, 2.0],
+            [3.0, 4.0],
+        ])
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (2,)
+        np.testing.assert_array_equal(fitness_batch, [1.0, 1.0])
 
 
 class TestSexualReproduction:
@@ -383,6 +491,59 @@ class TestEpistaticFitness:
         repr_str = repr(selector)
         assert "EpistaticFitness" in repr_str
 
+    def test_epistatic_fitness_compute_fitness_batch_single_individual(self):
+        """EpistaticFitness.compute_fitness_batch on single individual."""
+        interactions = np.array([[0.1, 0.3], [0.3, 0.1]])
+        selector = EpistaticFitness(interaction_matrix=interactions)
+
+        # Single individual with expressions [1.0, 1.0]
+        expr_matrix = np.array([[1.0, 1.0]])
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (1,)
+        # Base = mean(1.0, 1.0) = 1.0
+        # Epistasis = (1.0*1.0*0.1 + 1.0*1.0*0.3 + 1.0*1.0*0.3 + 1.0*1.0*0.1) / 2 = 0.8/2 = 0.4
+        # Total = 1.0 + 0.4 = 1.4
+        assert fitness_batch[0] == pytest.approx(1.4)
+
+    def test_epistatic_fitness_compute_fitness_batch_multiple_individuals(self):
+        """EpistaticFitness.compute_fitness_batch matches per-individual computation."""
+        interactions = np.array([[0.1, 0.3], [0.3, 0.1]])
+        selector = EpistaticFitness(interaction_matrix=interactions)
+
+        expr_matrix = np.array([
+            [1.0, 1.0],
+            [0.5, 0.5],
+            [2.0, 0.0],
+        ])
+
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (3,)
+
+        # Verify batch matches per-individual computation
+        for i in range(3):
+            genes = [Gene(f"g{j}", expr_matrix[i, j]) for j in range(2)]
+            individual = Individual(genes)
+            individual_fitness = selector.compute_fitness(individual)
+            assert individual_fitness == pytest.approx(fitness_batch[i])
+
+    def test_epistatic_fitness_compute_fitness_batch_zero_interaction(self):
+        """EpistaticFitness.compute_fitness_batch with zero interactions."""
+        interactions = np.zeros((2, 2))
+        selector = EpistaticFitness(interaction_matrix=interactions)
+
+        expr_matrix = np.array([
+            [1.0, 2.0],
+            [3.0, 4.0],
+        ])
+
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        # With zero interactions, fitness = mean expression only
+        assert fitness_batch.shape == (2,)
+        np.testing.assert_allclose(fitness_batch, [1.5, 3.5])
+
 
 class TestMultiObjectiveSelection:
     """Tests for MultiObjectiveSelection model (weighted objectives)."""
@@ -477,3 +638,73 @@ class TestMultiObjectiveSelection:
         selector = MultiObjectiveSelection(objective_weights=weights)
         repr_str = repr(selector)
         assert "MultiObjectiveSelection" in repr_str
+
+    def test_multi_objective_selection_compute_fitness_batch_single_individual(self):
+        """MultiObjectiveSelection.compute_fitness_batch on single individual."""
+        weights = [1.0, 1.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        expr_matrix = np.array([[0.6, 0.4]])
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (1,)
+        # Weighted mean = (1.0*0.6 + 1.0*0.4) / 2.0 = 0.5
+        assert fitness_batch[0] == pytest.approx(0.5)
+
+    def test_multi_objective_selection_compute_fitness_batch_multiple_individuals(self):
+        """MultiObjectiveSelection.compute_fitness_batch matches per-individual computation."""
+        weights = [2.0, 1.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        expr_matrix = np.array([
+            [1.0, 0.0],  # (2.0*1.0 + 1.0*0.0) / 3.0 = 2/3
+            [0.5, 0.5],  # (2.0*0.5 + 1.0*0.5) / 3.0 = 1.5/3 = 0.5
+            [0.0, 1.0],  # (2.0*0.0 + 1.0*1.0) / 3.0 = 1/3
+        ])
+
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (3,)
+        expected = [2.0/3.0, 0.5, 1.0/3.0]
+        np.testing.assert_allclose(fitness_batch, expected)
+
+        # Verify batch matches per-individual computation
+        for i in range(3):
+            genes = [Gene(f"g{j}", expr_matrix[i, j]) for j in range(2)]
+            individual = Individual(genes)
+            individual_fitness = selector.compute_fitness(individual)
+            assert individual_fitness == pytest.approx(fitness_batch[i])
+
+    def test_multi_objective_selection_compute_fitness_batch_zero_weights(self):
+        """MultiObjectiveSelection.compute_fitness_batch with all-zero weights."""
+        weights = [0.0, 0.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        expr_matrix = np.array([
+            [1.0, 1.0],
+            [0.5, 0.5],
+        ])
+
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (2,)
+        np.testing.assert_array_equal(fitness_batch, [0.0, 0.0])
+
+    def test_multi_objective_selection_compute_fitness_batch_three_objectives(self):
+        """MultiObjectiveSelection.compute_fitness_batch with three objectives."""
+        weights = [1.0, 1.0, 1.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        expr_matrix = np.array([
+            [0.5, 0.3, 0.8],
+            [1.0, 1.0, 1.0],
+        ])
+
+        fitness_batch = selector.compute_fitness_batch(expr_matrix)
+
+        assert fitness_batch.shape == (2,)
+        expected = [
+            (0.5 + 0.3 + 0.8) / 3.0,  # 0.533...
+            1.0,
+        ]
+        np.testing.assert_allclose(fitness_batch, expected)
