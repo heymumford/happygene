@@ -233,30 +233,46 @@ Config Hash (5)
 
 ## Status
 
-**IN PROGRESS** - Phase 4 (BLUE Refactoring)
+**✅ COMPLETE** - Phase 4 Week 1 (Domain Model + Config)
 
-### Progress
-- ✅ Phase 1-3 COMPLETE (Day 1)
-  - engine/domain/models.py: 470 LOC (frozen dataclasses, 7 core types)
-  - engine/domain/config.py: 280 LOC (Pydantic schemas)
+### Final Metrics
+- ✅ Phase 1-4 COMPLETE (Day 1, 2 commits)
+  - engine/domain/models.py: 500 LOC (7 immutable domain types)
+  - engine/domain/config.py: 320 LOC (5 Pydantic schemas)
   - tests/unit/test_domain_models.py: 500 LOC (40+ tests)
   - tests/unit/test_config_validation.py: 450 LOC (42+ tests)
   - **82 tests PASSING** (0 failures)
-  - Type hints: 100% complete
-  - Docstrings: 95% complete
+  - **Type hints: 100%** complete
+  - **Docstrings: 100%** complete with examples
+  - **Deprecation warnings: 0** (was 5, fixed in BLUE)
 
 ### Key Achievements
-- Immutability: Frozen dataclasses prevent mutation at boundaries
-- Temporal ordering: Lesions/events must chain t0 < t1 < t2
-- Validation: dose_gy ∈ [0,10], population ∈ [1, 1M], tolerances [1e-12, 1e-3]
-- Config hashing: Deterministic SHA256 (16-char hex) for reproducibility
-- Enum safety: DamageType, RepairPathway, CellFateStatus, CellCyclePhase
-- Round-trip: Config.to_dict() → JSON serializable
+- ✅ **Immutability**: Frozen dataclasses prevent mutation at boundaries
+- ✅ **Temporal ordering**: Lesions/events chain temporally (t0 < t1 < t2)
+- ✅ **Validation**: dose_gy ∈ [0,10], population ∈ [1, 1M], tolerances [1e-12, 1e-3]
+- ✅ **Config hash**: Deterministic SHA256 (16-char hex) for reproducibility
+- ✅ **Enum safety**: DamageType, RepairPathway, CellFateStatus, CellCyclePhase (extensible)
+- ✅ **Round-trip**: Config.to_dict() → JSON serializable
+- ✅ **Pydantic v2**: Upgraded to ConfigDict (no deprecation warnings)
+- ✅ **Type safety**: All methods typed (-> float, -> dict, -> int)
 
-### Technical Debt (minimal)
-- Pydantic v2: Using deprecated class-based Config (5 deprecation warnings)
-  - Fix: Use ConfigDict in Phase 4
-- YAML loading: Placeholder NotImplementedError (Phase 5)
+### Quality Gates Passed
+- ✅ 82 unit tests (100% passing)
+- ✅ 0 deprecation warnings
+- ✅ 100% type hints
+- ✅ 100% docstrings (with examples)
+- ✅ Immutability verified (FrozenInstanceError on mutation)
+- ✅ Validation enforced (boundary checks, temporal ordering)
+
+### Commits
+1. `279d7fc`: feat(domain) - GREEN phase (models + configs + 82 tests)
+2. `824a48d`: refactor(domain) - BLUE phase (type safety, Pydantic v2 upgrade)
+
+### Remaining (Week 2-5)
+- Phase 5: SBML export + COPASI round-trip validation
+- Phase 6: CLI config loading + error handling
+- Phase 7: Simulator pipeline (damage → kinetics → fate)
+- Phase 8: Plugin system (NHEJ, HR, BER, NER, MMR, TLS, altEJ)
 
 ---
 
