@@ -96,9 +96,50 @@ Files collected in `/Users/vorthruna/happygene/`:
 
 **Success Criteria**: Decision made on primary ODE solver, MCP POC functional, MVP scope frozen
 
+## Phase 3: ODE Solver Benchmarking (IN PROGRESS)
+
+### Agent 1: ODE Solver Benchmarking ✅ COMPLETE
+
+**Task**: Compare 4 ODE solver options (SciPy, assimulo, lsoda, PyDSTool) on convergence, stiffness handling, speed, memory, Python integration, documentation, reproducibility.
+
+**Key Finding**: **SciPy BDF is recommended** for Phase 1 MVP.
+
+**Evidence**:
+- Convergence: 5/5 (Robertson problem stiffness λ~10^6 proven; DNA repair ~10^5)
+- Stiffness handling: 4/5 (Designed for λ ratios up to 10^7)
+- Speed: 4/5 (5-15 ms per 24-hour integration, 1000 trajectories in 5-15 sec)
+- Memory: 5/5 (Sparse Jacobian support, low overhead)
+- Python integration: 5/5 (Zero new dependencies, SciPy native)
+- Documentation: 4/5 (Excellent, tolerance/Jacobian guidance clear)
+- Reproducibility: 5/5 (Deterministic, seed-based)
+
+**Tier 1 Configuration** (Publication-Grade):
+```python
+solve_ivp(dna_repair_odes, t_span, y0, method='BDF',
+          jac=jacobian_analytical, rtol=1e-6, atol=1e-9)
+```
+
+**Fallback Options**:
+- **Assimulo CVode (Tier 2)**: If stiffness > 10^6 or N_vars > 50
+- **PyDSTool (Tier 3)**: Only if need cell-cycle events
+
+**Deliverables** (6 documents, 90 KB):
+- README_ODE_SOLVERS.md (quick decision tree)
+- ODE_SOLVER_BENCHMARK.md (technical comparison)
+- ODE_SOLVER_QUICK_START.py (working code, all 3 tiers)
+- ODE_SOLVER_TUNING_GUIDE.md (tolerance + Jacobian tuning)
+- COMPARISON_SCORECARD.txt (visual scorecard)
+- INDEX_ODE_SOLVER_RESEARCH.md (navigation)
+
+**Confidence**: VERY HIGH (5/5, published evidence)
+
+**Files**: `/Users/vorthruna/ProjectsWATTS/README_ODE_SOLVERS.md` (start here)
+
+---
+
 ## Next Steps
 
-1. Dispatch all 12 agents in parallel (Phase 2)
-2. Collect results into this table as agents complete
-3. After Iteration 1 complete: synthesize findings into Iteration 2 recommendations
-4. Identify 3-4 technology stacks for detailed evaluation
+1. Collect remaining agents (best-practices-researcher, framework-docs-researcher)
+2. Synthesize ODE solver decision into Phase 1 MVP scope
+3. Proceed to Phase 3, Part B (macOS framework comparison)
+4. Proceed to Phase 3, Part C (cloud-local orchestration design)
