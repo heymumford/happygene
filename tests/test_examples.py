@@ -215,3 +215,65 @@ class TestExamples:
 
         # Should show the scenario was run (Y indicates regulation=true in table)
         assert "Y" in result.stdout, "Output should show regulation flag"
+
+    def test_regulatory_network_advanced_example_runs(self):
+        """Test that regulatory_network_advanced.py example script runs successfully.
+
+        Rationale: Verify that the advanced example demonstrating complex regulatory
+        networks with epistatic fitness works correctly. This is the Phase 2 showcase
+        example combining RegulatoryNetwork + EpistaticFitness + Evolution.
+
+        Success criteria:
+        - Script exits with code 0
+        - Produces output to stdout
+        - Contains regulatory network configuration output
+        - Contains fitness statistics from evolution
+        - Completes 100 generations successfully
+        """
+        result = subprocess.run(
+            [sys.executable, "examples/regulatory_network_advanced.py"],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+
+        # Should exit successfully
+        assert result.returncode == 0, \
+            f"Example script failed with code {result.returncode}\nstderr: {result.stderr}"
+
+        # Should produce output
+        assert len(result.stdout) > 0, "Example script produced no output"
+
+        # Should contain regulatory network setup
+        assert "Advanced Regulatory Network" in result.stdout, \
+            "Output missing advanced network header"
+        assert "repressilator" in result.stdout.lower(), \
+            "Output missing repressilator description"
+        assert "Gene count: 5" in result.stdout, \
+            "Output missing 5-gene network info"
+
+        # Should show network properties
+        assert "Interactions:" in result.stdout, "Output missing interaction count"
+        assert "Detected feedback loops" in result.stdout, \
+            "Output missing circuit detection"
+
+        # Should contain fitness model setup
+        assert "epistatic fitness" in result.stdout.lower(), \
+            "Output missing epistatic fitness description"
+        assert "5x5 interaction matrix" in result.stdout, \
+            "Output missing interaction matrix info"
+
+        # Should show evolution progress
+        assert "100 generations" in result.stdout.lower(), \
+            "Output missing evolution progress"
+        assert "Gen" in result.stdout, "Output missing generation markers"
+
+        # Should contain fitness statistics
+        assert "mean_fitness" in result.stdout, \
+            "Output missing fitness statistics"
+        assert "Gene expression (mean)" in result.stdout, \
+            "Output missing gene expression stats"
+
+        # Should complete successfully
+        assert "Example 3 complete!" in result.stdout, \
+            "Output missing completion marker"
