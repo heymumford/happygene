@@ -13,6 +13,7 @@ from happygene.expression import (
 )
 from happygene.model import GeneNetwork
 from happygene.mutation import MutationModel, PointMutation
+from happygene.regulatory_network import RegulationConnection, RegulatoryNetwork
 from happygene.selection import (
     ProportionalSelection,
     SelectionModel,
@@ -35,4 +36,6 @@ __all__ = [
     "MutationModel",
     "PointMutation",
     "DataCollector",
+    "RegulatoryNetwork",
+    "RegulationConnection",
 ]
