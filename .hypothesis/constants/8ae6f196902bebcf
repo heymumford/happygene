@@ -1,4 +1,4 @@
-# file: /Users/vorthruna/.worktrees/phase-3-blue/engine/domain/models.py
+# file: /Users/vorthruna/ProjectsWATTS/happygene/engine/domain/models.py
 # hypothesis_version: 6.150.2
 
 [0.0, 1.0, 1000000, 'G1', 'G2', 'M', 'S', 'apoptosis', 'apoptosis_rate', 'base_excision_repair', 'crosslink', 'deamination', 'depurination', 'direct_reversal', 'dose_gy', 'double_strand_break', 'elapsed_time', 'events', 'initial_lesions', 'mismatch_repair', 'mitotic_death', 'oxidative', 'population_size', 'repaired', 'rmse', 'seed', 'senescence', 'senescence_rate', 'single_strand_break', 'success', 'survival_rate', 'thymine_dimer', 'time_seconds', 'transformation', 'unrepaired', 'viable']

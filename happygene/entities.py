@@ -1,4 +1,5 @@
 """Gene and Individual entity classes."""
+
 from typing import List
 
 
@@ -12,6 +13,8 @@ class Gene:
     expression_level : float
         Current expression level. Negative values are clamped to 0.
     """
+
+    __slots__ = ('name', '_expression_level')
 
     def __init__(self, name: str, expression_level: float):
         self.name: str = name
@@ -32,6 +35,8 @@ class Individual:
     genes : List[Gene]
         List of Gene objects in this individual.
     """
+
+    __slots__ = ('genes', 'fitness')
 
     def __init__(self, genes: List[Gene]):
         self.genes: List[Gene] = genes

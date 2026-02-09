@@ -34,9 +34,11 @@ Example
 R²: 0.950
 """
 
+from typing import Dict, List
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Optional, Tuple, List
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 
 class ResponseSurfaceModel:
@@ -77,12 +79,11 @@ class ResponseSurfaceModel:
         self
             For method chaining.
         """
-        # Lazy imports to avoid hard dependencies
-        from sklearn.preprocessing import StandardScaler
-        from sklearn.linear_model import LinearRegression
+        # Import additional sklearn models
         from sklearn.ensemble import RandomForestRegressor
+        from sklearn.linear_model import LinearRegression
 
-        # Re-initialize scaler with proper import
+        # Re-initialize scaler for fresh state
         self.scaler = StandardScaler()
 
         # Extract data
@@ -106,7 +107,9 @@ class ResponseSurfaceModel:
 
         # Fit model
         if self.method == "rf":
-            self.model = RandomForestRegressor(n_estimators=100, random_state=42, max_depth=10)
+            self.model = RandomForestRegressor(
+                n_estimators=100, random_state=42, max_depth=10
+            )
         else:
             self.model = LinearRegression()
 
@@ -151,7 +154,10 @@ class ResponseSurfaceModel:
         return self.model.predict(X_test)
 
     def cross_validate(
-        self, batch_results: pd.DataFrame, output_col: str = "survival", cv_folds: int = 5
+        self,
+        batch_results: pd.DataFrame,
+        output_col: str = "survival",
+        cv_folds: int = 5,
     ) -> Dict[str, float]:
         """Cross-validate model performance.
 
@@ -169,17 +175,18 @@ class ResponseSurfaceModel:
         dict
             Metrics: 'r2', 'rmse', 'mae' (mean absolute error)
         """
-        from sklearn.metrics import mean_absolute_error, mean_squared_error
-        from sklearn.linear_model import LinearRegression
         from sklearn.ensemble import RandomForestRegressor
+        from sklearn.linear_model import LinearRegression
+        from sklearn.metrics import mean_absolute_error, mean_squared_error
 
         param_cols = [p for p in self.param_names if p in batch_results.columns]
         X = batch_results[param_cols].values
         y = batch_results[output_col].values
 
         # Use fitted scaler for consistency with predict()
-        if not hasattr(self, 'scaler') or self.scaler is None:
+        if not hasattr(self, "scaler") or self.scaler is None:
             from sklearn.preprocessing import StandardScaler
+
             self.scaler = StandardScaler()
             X_scaled = self.scaler.fit_transform(X)
         else:
@@ -197,7 +204,9 @@ class ResponseSurfaceModel:
 
         # Fit model for scoring
         if self.method == "rf":
-            model = RandomForestRegressor(n_estimators=100, random_state=42, max_depth=10)
+            model = RandomForestRegressor(
+                n_estimators=100, random_state=42, max_depth=10
+            )
         else:
             model = LinearRegression()
 
@@ -226,7 +235,5 @@ class ResponseSurfaceModel:
         np.ndarray
             Expanded feature matrix with polynomial terms
         """
-        from sklearn.preprocessing import PolynomialFeatures
-
         poly = PolynomialFeatures(degree=degree, include_bias=False)
         return poly.fit_transform(X)

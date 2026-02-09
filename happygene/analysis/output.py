@@ -33,9 +33,10 @@ Exported: sobol_indices.csv
 """
 
 import json
-import pandas as pd
-from typing import Dict, Optional, Tuple, List
 from pathlib import Path
+from typing import Dict
+
+import pandas as pd
 
 
 class OutputExporter:
@@ -192,7 +193,9 @@ class OutputExporter:
         exports = {}
 
         # Export batch results
-        exports["batch_results"] = self.export_batch_results_to_csv(batch_results, f"{name}_batch_results")
+        exports["batch_results"] = self.export_batch_results_to_csv(
+            batch_results, f"{name}_batch_results"
+        )
 
         # Export indices
         for analysis_name, indices_df in indices_data.items():
@@ -208,6 +211,8 @@ class OutputExporter:
             "summary": summary,
             "analyses": {k: v.to_dict() for k, v in indices_data.items()},
         }
-        exports["complete"] = self.export_results_to_json(complete_results, f"{name}_complete")
+        exports["complete"] = self.export_results_to_json(
+            complete_results, f"{name}_complete"
+        )
 
         return exports

@@ -7,9 +7,9 @@ Provides:
 - Helper functions: denormalize, generate_run_id, etc.
 """
 
+from typing import Dict, Tuple
+
 import numpy as np
-from typing import Dict, Tuple, Optional
-from pathlib import Path
 
 
 class SeedManager:
@@ -72,9 +72,7 @@ class ParameterValidator:
                     f"Parameter '{pname}': lower bound ({low}) must be < upper bound ({high})"
                 )
             if low < 0 or high < 0:
-                raise ValueError(
-                    f"Parameter '{pname}': bounds must be non-negative"
-                )
+                raise ValueError(f"Parameter '{pname}': bounds must be non-negative")
 
     @staticmethod
     def validate_samples(samples: np.ndarray, n_params: int) -> None:

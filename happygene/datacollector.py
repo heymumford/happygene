@@ -1,7 +1,8 @@
 """DataCollector for 3-tier data collection (model, individual, gene level)."""
-from typing import Dict, Callable, Any, List
-from collections import deque
+from typing import Any, Callable, Dict, List
+
 import pandas as pd
+
 from happygene.model import GeneNetwork
 
 

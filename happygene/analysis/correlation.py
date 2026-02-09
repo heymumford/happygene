@@ -37,9 +37,10 @@ Top parameter: p0
 - Partial correlation analysis
 """
 
+from typing import Dict, List
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Optional, List
 
 
 class CorrelationAnalyzer:
@@ -89,7 +90,10 @@ class CorrelationAnalyzer:
         return corr
 
     def parameter_output_correlation(
-        self, batch_results: pd.DataFrame, output_col: str = "survival", method: str = "pearson"
+        self,
+        batch_results: pd.DataFrame,
+        output_col: str = "survival",
+        method: str = "pearson",
     ) -> pd.DataFrame:
         """Compute correlation between parameters and output.
 

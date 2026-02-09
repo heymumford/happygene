@@ -36,13 +36,15 @@ Example
 Most important parameter: p0
 """
 
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Tuple, Optional, List
-from dataclasses import dataclass
 
 try:
     from SALib.analyze import sobol as sobol_analyze
+
     SALIB_AVAILABLE = True
 except ImportError:
     SALIB_AVAILABLE = False
@@ -112,9 +114,7 @@ class SobolAnalyzer:
         Parameter bounds (unused for analysis, kept for consistency)
     """
 
-    def __init__(
-        self, param_names: List[str], param_space: Optional[Dict] = None
-    ):
+    def __init__(self, param_names: List[str], param_space: Optional[Dict] = None):
         """Initialize SobolAnalyzer."""
         if not SALIB_AVAILABLE:
             raise ImportError("SALib required: pip install SALib")
@@ -161,7 +161,6 @@ class SobolAnalyzer:
                 f"Expected {self.n_params} params, found {len(param_cols)}"
             )
 
-        X = batch_results[param_cols].values
         Y = batch_results[output_col].values
 
         # Define problem for SALib
@@ -213,9 +212,7 @@ class SobolAnalyzer:
 
         return bounds
 
-    def rank_parameters(
-        self, indices: SobolIndices, by: str = "ST"
-    ) -> pd.DataFrame:
+    def rank_parameters(self, indices: SobolIndices, by: str = "ST") -> pd.DataFrame:
         """Rank parameters by sensitivity index.
 
         Parameters
@@ -264,14 +261,18 @@ class SobolAnalyzer:
             If S2 (second-order indices) not computed.
         """
         if indices.S2 is None:
-            raise ValueError("Second-order indices not computed. Set calc_second_order=True")
+            raise ValueError(
+                "Second-order indices not computed. Set calc_second_order=True"
+            )
 
         interactions = []
         for i in range(self.n_params):
             for j in range(i + 1, self.n_params):
                 s2_val = indices.S2[i, j]
                 if s2_val >= threshold:
-                    interactions.append((self.param_names[i], self.param_names[j], s2_val))
+                    interactions.append(
+                        (self.param_names[i], self.param_names[j], s2_val)
+                    )
 
         # Sort by S2 value descending
         interactions.sort(key=lambda x: x[2], reverse=True)

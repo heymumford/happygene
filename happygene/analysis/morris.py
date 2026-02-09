@@ -38,13 +38,15 @@ Example
 Important parameters: ['p0']
 """
 
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Tuple, Optional, List
-from dataclasses import dataclass
 
 try:
     from SALib.analyze import morris as morris_analyze
+
     SALIB_AVAILABLE = True
 except ImportError:
     SALIB_AVAILABLE = False
@@ -120,9 +122,7 @@ class MorrisAnalyzer:
         Parameter bounds (unused for analysis, kept for consistency)
     """
 
-    def __init__(
-        self, param_names: List[str], param_space: Optional[Dict] = None
-    ):
+    def __init__(self, param_names: List[str], param_space: Optional[Dict] = None):
         """Initialize MorrisAnalyzer."""
         if not SALIB_AVAILABLE:
             raise ImportError("SALib required: pip install SALib")
@@ -212,7 +212,9 @@ class MorrisAnalyzer:
 
         return bounds
 
-    def rank_parameters(self, indices: MorrisIndices, by: str = "mu_star") -> pd.DataFrame:
+    def rank_parameters(
+        self, indices: MorrisIndices, by: str = "mu_star"
+    ) -> pd.DataFrame:
         """Rank parameters by Morris index.
 
         Parameters
@@ -242,7 +244,10 @@ class MorrisAnalyzer:
             raise ValueError(f"Unknown index: {by}")
 
     def classify_parameters(
-        self, indices: MorrisIndices, mu_threshold: float = 0.1, sigma_threshold: float = 0.1
+        self,
+        indices: MorrisIndices,
+        mu_threshold: float = 0.1,
+        sigma_threshold: float = 0.1,
     ) -> Dict[str, List[str]]:
         """Classify parameters into importance categories.
 

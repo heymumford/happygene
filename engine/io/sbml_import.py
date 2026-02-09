@@ -1,4 +1,3 @@
-
 # Copyright (C) 2026 Eric C. Mumford <ericmumford@outlook.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,15 +28,12 @@ Validation:
 Production implementation with full round-trip fidelity.
 """
 
-from pathlib import Path
-from typing import Union, Tuple, Dict
 import xml.etree.ElementTree as ET
+from pathlib import Path
+from typing import Dict, Tuple, Union
 
-from engine.domain.models import (
-    Lesion, DamageProfile, DamageType, CellCyclePhase
-)
 from engine.domain.config import KineticsConfig, SolverMethod
-
+from engine.domain.models import CellCyclePhase, DamageProfile, DamageType, Lesion
 
 SBML_NAMESPACE = "http://www.sbml.org/sbml/level3/version2"
 
@@ -80,7 +76,7 @@ def _species_id_to_damage_type(species_id: str) -> Tuple[DamageType, bool]:
 
 
 def import_from_sbml(
-    sbml_path: Union[str, Path]
+    sbml_path: Union[str, Path],
 ) -> Tuple[DamageProfile, KineticsConfig]:
     """
     Import SBML file and reconstruct domain models.
@@ -150,8 +146,7 @@ def import_from_sbml(
 
 
 def _extract_parameter_values(
-    model: ET.Element,
-    namespaces: Dict[str, str]
+    model: ET.Element, namespaces: Dict[str, str]
 ) -> Dict[str, str]:
     """Extract all parameter values from model."""
     # Try to find listOfParameters with various methods
@@ -189,9 +184,7 @@ def _extract_parameter_values(
 
 
 def _extract_damage_profile(
-    model: ET.Element,
-    namespaces: Dict[str, str],
-    param_values: Dict[str, str]
+    model: ET.Element, namespaces: Dict[str, str], param_values: Dict[str, str]
 ) -> DamageProfile:
     """Extract species and reconstruct DamageProfile."""
     # Find species list (robust to namespacing)
@@ -240,7 +233,7 @@ def _extract_damage_profile(
                 position_bp=i * 100,  # Arbitrary positions
                 damage_type=damage_type,
                 time_seconds=0.0,
-                severity=1.0
+                severity=1.0,
             )
             lesions.append(lesion)
 
@@ -253,16 +246,14 @@ def _extract_damage_profile(
         lesions=tuple(lesions),
         dose_gy=dose_gy,
         population_size=population_size,
-        cell_cycle_phase=CellCyclePhase.G1  # Default value
+        cell_cycle_phase=CellCyclePhase.G1,  # Default value
     )
 
     return damage_profile
 
 
 def _extract_kinetics_config(
-    model: ET.Element,
-    namespaces: Dict[str, str],
-    param_values: Dict[str, str]
+    model: ET.Element, namespaces: Dict[str, str], param_values: Dict[str, str]
 ) -> KineticsConfig:
     """Extract parameters and reconstruct KineticsConfig."""
     # Reconstruct KineticsConfig
@@ -279,9 +270,4 @@ def _extract_kinetics_config(
     }
     method = method_map.get(method_str, SolverMethod.BDF)
 
-    return KineticsConfig(
-        method=method,
-        rtol=rtol,
-        atol=atol,
-        max_step=max_step
-    )
+    return KineticsConfig(method=method, rtol=rtol, atol=atol, max_step=max_step)

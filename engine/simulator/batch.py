@@ -1,4 +1,3 @@
-
 # Copyright (C) 2026 Eric C. Mumford <ericmumford@outlook.com>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -131,8 +130,7 @@ class BatchSimulator:
                     except (TypeError, ValueError):
                         # Fallback for complex types
                         f.create_dataset(
-                            key,
-                            data=np.array([str(v) for v in values], dtype="S")
+                            key, data=np.array([str(v) for v in values], dtype="S")
                         )
 
     @staticmethod
@@ -166,7 +164,11 @@ class BatchSimulator:
                     if isinstance(value, np.bytes_):
                         result[key] = value.decode()
                     else:
-                        result[key] = float(value) if isinstance(value, (np.floating, np.integer)) else value
+                        result[key] = (
+                            float(value)
+                            if isinstance(value, (np.floating, np.integer))
+                            else value
+                        )
                 results.append(result)
 
         return results
