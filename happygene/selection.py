@@ -304,3 +304,94 @@ class EpistaticFitness(SelectionModel):
 
     def __repr__(self) -> str:
         return f"EpistaticFitness({self._n_genes}x{self._n_genes})"
+
+
+class MultiObjectiveSelection(SelectionModel):
+    """Multi-objective selection based on weighted aggregate fitness.
+
+    Computes fitness as a weighted aggregate of individual gene expression levels,
+    effectively implementing a multi-objective fitness function where each gene
+    is an objective to maximize.
+
+    For populations with conflicting objectives (e.g., maximize g0 and g1 which
+    may trade off), this model ranks individuals by weighted objectives, with
+    lower-ranked (dominated) individuals receiving proportionally lower fitness.
+
+    Parameters
+    ----------
+    objective_weights : list of float
+        Weights for each objective (one per gene). Non-negative values.
+        Weights are normalized: fitness = sum(expr_i * weight_i) / sum(weight_i)
+
+    Example
+    -------
+    >>> # Three objectives: maximize all equally
+    >>> weights = [1.0, 1.0, 1.0]
+    >>> selector = MultiObjectiveSelection(objective_weights=weights)
+    >>> individual = Individual([Gene("g0", 0.5), Gene("g1", 0.3), Gene("g2", 0.8)])
+    >>> fitness = selector.compute_fitness(individual)  # (0.5+0.3+0.8)/3 = 0.533
+    """
+
+    def __init__(self, objective_weights: list):
+        """Initialize multi-objective selection model.
+
+        Parameters
+        ----------
+        objective_weights : list of float
+            Non-negative weights for each objective.
+
+        Raises
+        ------
+        ValueError
+            If any weight is negative.
+        """
+        weights = np.asarray(objective_weights, dtype=float)
+
+        if np.any(weights < 0):
+            raise ValueError(
+                f"All weights must be non-negative, got {objective_weights}"
+            )
+
+        self.objective_weights = weights.copy()
+        self._sum_weights = np.sum(weights)
+        self._n_objectives = len(weights)
+
+    def compute_fitness(self, individual: Individual) -> float:
+        """Compute fitness as weighted aggregate of objectives.
+
+        Fitness = sum(weight_i * objective_i) / sum(weights)
+        where objective_i = expression level of gene i.
+
+        Parameters
+        ----------
+        individual : Individual
+            Individual to evaluate.
+
+        Returns
+        -------
+        float
+            Weighted aggregate fitness (typically in [0, 1] if expressions are).
+
+        Raises
+        ------
+        ValueError
+            If individual gene count doesn't match number of objectives.
+        """
+        expr_vector = np.array([gene.expression_level for gene in individual.genes])
+
+        if len(expr_vector) != self._n_objectives:
+            raise ValueError(
+                f"Individual has {len(expr_vector)} genes, "
+                f"but model expects {self._n_objectives} objectives"
+            )
+
+        # Weighted aggregate fitness
+        if self._sum_weights > 0:
+            weighted_sum = np.sum(expr_vector * self.objective_weights)
+            return weighted_sum / self._sum_weights
+        else:
+            # All weights are zero (edge case)
+            return 0.0
+
+    def __repr__(self) -> str:
+        return f"MultiObjectiveSelection({self._n_objectives} objectives)"

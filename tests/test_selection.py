@@ -9,6 +9,7 @@ from happygene.selection import (
     SexualReproduction,
     AsexualReproduction,
     EpistaticFitness,
+    MultiObjectiveSelection,
 )
 
 
@@ -381,3 +382,98 @@ class TestEpistaticFitness:
         selector = EpistaticFitness(interaction_matrix=interactions)
         repr_str = repr(selector)
         assert "EpistaticFitness" in repr_str
+
+
+class TestMultiObjectiveSelection:
+    """Tests for MultiObjectiveSelection model (weighted objectives)."""
+
+    def test_multi_objective_selection_creation(self):
+        """MultiObjectiveSelection can be instantiated with objective weights."""
+        weights = [1.0, 1.0, 0.5]  # Three objectives
+        selector = MultiObjectiveSelection(objective_weights=weights)
+        assert selector is not None
+        assert len(selector.objective_weights) == 3
+
+    def test_multi_objective_selection_requires_non_negative_weights(self):
+        """MultiObjectiveSelection rejects negative weights."""
+        weights = [1.0, -0.5, 0.5]  # Negative weight invalid
+        with pytest.raises(ValueError, match="non-negative"):
+            MultiObjectiveSelection(objective_weights=weights)
+
+    def test_multi_objective_selection_single_objective(self):
+        """MultiObjectiveSelection with one objective: fitness = expr."""
+        weights = [1.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        genes = [Gene("g0", 0.5)]
+        individual = Individual(genes)
+
+        # Single objective = expr value
+        fitness = selector.compute_fitness(individual)
+        assert fitness == pytest.approx(0.5)
+
+    def test_multi_objective_selection_equal_weights(self):
+        """MultiObjectiveSelection with equal weights: fitness = mean expression."""
+        weights = [1.0, 1.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        genes = [Gene("g0", 0.6), Gene("g1", 0.4)]
+        individual = Individual(genes)
+
+        # Weighted mean = (1.0*0.6 + 1.0*0.4) / 2.0 = 0.5
+        fitness = selector.compute_fitness(individual)
+        assert fitness == pytest.approx(0.5)
+
+    def test_multi_objective_selection_weighted_objectives(self):
+        """MultiObjectiveSelection applies weights to objectives."""
+        # g0 twice as important as g1
+        weights = [2.0, 1.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        genes = [Gene("g0", 1.0), Gene("g1", 0.0)]
+        individual = Individual(genes)
+
+        # Weighted mean = (2.0*1.0 + 1.0*0.0) / (2.0 + 1.0) = 2.0/3.0
+        fitness = selector.compute_fitness(individual)
+        assert fitness == pytest.approx(2.0 / 3.0)
+
+    def test_multi_objective_selection_three_objectives(self):
+        """MultiObjectiveSelection handles three objectives correctly."""
+        weights = [1.0, 1.0, 1.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        genes = [Gene("g0", 0.3), Gene("g1", 0.5), Gene("g2", 0.7)]
+        individual = Individual(genes)
+
+        # Weighted mean = (0.3 + 0.5 + 0.7) / 3 = 1.5 / 3 = 0.5
+        fitness = selector.compute_fitness(individual)
+        assert fitness == pytest.approx(0.5)
+
+    def test_multi_objective_selection_all_zero_expression(self):
+        """MultiObjectiveSelection handles all-zero individual."""
+        weights = [1.0, 1.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        genes = [Gene("g0", 0.0), Gene("g1", 0.0)]
+        individual = Individual(genes)
+
+        fitness = selector.compute_fitness(individual)
+        assert fitness == 0.0
+
+    def test_multi_objective_selection_zero_weights(self):
+        """MultiObjectiveSelection with all-zero weights returns 0."""
+        weights = [0.0, 0.0]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+
+        genes = [Gene("g0", 1.0), Gene("g1", 1.0)]
+        individual = Individual(genes)
+
+        fitness = selector.compute_fitness(individual)
+        assert fitness == 0.0
+
+    def test_multi_objective_selection_repr(self):
+        """MultiObjectiveSelection has informative repr."""
+        weights = [1.0, 1.0, 0.5]
+        selector = MultiObjectiveSelection(objective_weights=weights)
+        repr_str = repr(selector)
+        assert "MultiObjectiveSelection" in repr_str

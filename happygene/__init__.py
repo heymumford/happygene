@@ -23,6 +23,7 @@ from happygene.regulatory_network import RegulationConnection, RegulatoryNetwork
 from happygene.selection import (
     AsexualReproduction,
     EpistaticFitness,
+    MultiObjectiveSelection,
     ProportionalSelection,
     SelectionModel,
     SexualReproduction,
@@ -49,6 +50,7 @@ __all__ = [
     "SexualReproduction",
     "AsexualReproduction",
     "EpistaticFitness",
+    "MultiObjectiveSelection",
     "MutationModel",
     "PointMutation",
     "DataCollector",
