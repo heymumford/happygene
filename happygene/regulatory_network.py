@@ -181,8 +181,14 @@ class RegulatoryNetwork:
         # adjacency @ expr = TF inputs (sparse matrix multiplication)
         return self._adjacency @ expression_vector
 
-    def _compute_is_acyclic(self) -> bool:
-        """Detect cycles in regulatory network using networkx."""
+    def _build_networkx_digraph(self) -> nx.DiGraph:
+        """Build NetworkX directed graph from sparse adjacency matrix.
+
+        Returns
+        -------
+        nx.DiGraph
+            Directed graph with nodes for each gene and edges from sparse matrix.
+        """
         G = nx.DiGraph()
         G.add_nodes_from(range(self._n_genes))
 
@@ -191,6 +197,12 @@ class RegulatoryNetwork:
         for i, j, v in zip(cx.row, cx.col, cx.data):
             if v != 0:
                 G.add_edge(j, i)  # j → i (reverse of adjacency storage)
+
+        return G
+
+    def _compute_is_acyclic(self) -> bool:
+        """Detect cycles in regulatory network using networkx."""
+        G = self._build_networkx_digraph()
 
         try:
             # If no cycle found, is_acyclic returns True
@@ -207,14 +219,7 @@ class RegulatoryNetwork:
             List of feedback loops (SCCs with size > 1), each as a set of gene names.
             Empty list if network is acyclic.
         """
-        G = nx.DiGraph()
-        G.add_nodes_from(range(self._n_genes))
-
-        # Add edges from sparse matrix
-        cx = self._adjacency.tocoo()
-        for i, j, v in zip(cx.row, cx.col, cx.data):
-            if v != 0:
-                G.add_edge(j, i)  # j → i (reverse of adjacency storage)
+        G = self._build_networkx_digraph()
 
         # Find strongly connected components
         sccs = nx.strongly_connected_components(G)
