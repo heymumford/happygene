@@ -656,3 +656,71 @@ class TestGeneNetwork:
 
         assert abs(individual.genes[0].expression_level - 0.5) < 1e-10
         assert abs(individual.genes[1].expression_level - 1.5) < 1e-10
+
+    def test_gene_network_profile_step_execution(self):
+        """Profile GeneNetwork.step() to identify performance bottlenecks.
+
+        Captures cProfile output for medium-scale scenario (5k indiv × 50 genes × 1 gen)
+        to analyze where time is spent in expression, selection, mutation phases.
+
+        Returns profile statistics for bottleneck analysis:
+        - Top 5 functions by cumulative time
+        - Expression phase overhead
+        - Regulatory computation cost (if present)
+        """
+        import cProfile
+        import pstats
+        import io
+
+        # Create medium-scale scenario for profiling
+        n_individuals = 5000
+        n_genes = 50
+
+        individuals = [
+            Individual(genes=[Gene(f"G{j}", np.random.uniform(0.5, 1.5)) for j in range(n_genes)])
+            for _ in range(n_individuals)
+        ]
+
+        expr_model = LinearExpression(slope=1.0, intercept=0.1)
+        select_model = ProportionalSelection()
+        mutate_model = PointMutation(rate=0.1, magnitude=0.05)
+
+        # Create regulatory network for profiling (optional, can be None)
+        regulatory_network = None
+
+        model = GeneNetwork(
+            individuals=individuals,
+            expression_model=expr_model,
+            selection_model=select_model,
+            mutation_model=mutate_model,
+            regulatory_network=regulatory_network,
+            seed=42
+        )
+
+        # Profile the step function
+        profiler = cProfile.Profile()
+        profiler.enable()
+
+        model.step()
+
+        profiler.disable()
+
+        # Capture profile stats to string
+        s = io.StringIO()
+        stats = pstats.Stats(profiler, stream=s)
+        stats.sort_stats('cumulative')
+        stats.print_stats(10)  # Top 10 functions
+
+        profile_output = s.getvalue()
+
+        # Assert that profiling completed and produced output
+        assert profile_output is not None
+        assert len(profile_output) > 0
+        assert "step" in profile_output or "expression" in profile_output
+
+        # Print profile for inspection (will appear in pytest output)
+        print("\n" + "=" * 80)
+        print("PROFILING OUTPUT: GeneNetwork.step() - 5k × 50 × 1")
+        print("=" * 80)
+        print(profile_output)
+        print("=" * 80)
