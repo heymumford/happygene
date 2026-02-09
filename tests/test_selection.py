@@ -1,5 +1,6 @@
 """Tests for selection models."""
 import pytest
+import numpy as np
 from happygene.entities import Gene, Individual
 from happygene.selection import (
     SelectionModel,
@@ -7,6 +8,7 @@ from happygene.selection import (
     ThresholdSelection,
     SexualReproduction,
     AsexualReproduction,
+    EpistaticFitness,
 )
 
 
@@ -292,3 +294,90 @@ class TestAsexualReproduction:
         reproducer = AsexualReproduction()
         repr_str = repr(reproducer)
         assert "AsexualReproduction" in repr_str
+
+
+class TestEpistaticFitness:
+    """Tests for EpistaticFitness model (gene-gene interactions)."""
+
+    def test_epistatic_fitness_creation(self):
+        """EpistaticFitness can be instantiated with interaction matrix."""
+        interactions = np.array([[0.5, 0.3], [0.2, -0.1]])  # 2x2 matrix
+        selector = EpistaticFitness(interaction_matrix=interactions)
+        assert selector is not None
+        assert selector.interaction_matrix.shape == (2, 2)
+
+    def test_epistatic_fitness_requires_square_matrix(self):
+        """EpistaticFitness rejects non-square interaction matrices."""
+        interactions = np.array([[0.5, 0.3, 0.1], [0.2, -0.1, 0.4]])  # 2x3
+        with pytest.raises(ValueError, match="square"):
+            EpistaticFitness(interaction_matrix=interactions)
+
+    def test_epistatic_fitness_matrix_size_matches_genes(self):
+        """EpistaticFitness validates matrix size matches gene count."""
+        genes = [Gene("g0", 1.0), Gene("g1", 0.5)]
+        individual = Individual(genes)
+
+        # 3x3 matrix for 2 genes = mismatch
+        interactions = np.eye(3)
+        selector = EpistaticFitness(interaction_matrix=interactions)
+
+        with pytest.raises(ValueError, match="size"):
+            selector.compute_fitness(individual)
+
+    def test_epistatic_fitness_additive_base_plus_interactions(self):
+        """EpistaticFitness: fitness = base + epistatic term."""
+        # 2 genes, no interactions
+        interactions = np.zeros((2, 2))
+        selector = EpistaticFitness(interaction_matrix=interactions)
+
+        genes = [Gene("g0", 1.0), Gene("g1", 0.5)]
+        individual = Individual(genes)
+
+        # Base fitness = mean(1.0, 0.5) = 0.75, no epistasis = 0
+        # Total = 0.75
+        fitness = selector.compute_fitness(individual)
+        assert fitness == pytest.approx(0.75)
+
+    def test_epistatic_fitness_interaction_bonus(self):
+        """EpistaticFitness includes gene-gene interaction term."""
+        # 2x2 interaction matrix
+        interactions = np.array([
+            [0.1, 0.2],  # g0-g0 bonus=0.1, g0-g1 bonus=0.2
+            [0.2, 0.1],  # g1-g0 bonus=0.2, g1-g1 bonus=0.1
+        ])
+        selector = EpistaticFitness(interaction_matrix=interactions)
+
+        genes = [Gene("g0", 1.0), Gene("g1", 1.0)]
+        individual = Individual(genes)
+
+        # Base = 1.0
+        # Epistasis = sum of all pairwise products weighted by interaction matrix
+        # = (1.0*1.0*0.1 + 1.0*1.0*0.2 + 1.0*1.0*0.2 + 1.0*1.0*0.1) / 2 = 0.6 / 2 = 0.3
+        # Total = 1.0 + 0.3 = 1.3
+        fitness = selector.compute_fitness(individual)
+        assert fitness == pytest.approx(1.3)
+
+    def test_epistatic_fitness_synergistic_interaction(self):
+        """EpistaticFitness models synergistic interactions (g0 AND g1 high)."""
+        interactions = np.array([
+            [0.1, 0.4],
+            [0.4, 0.1],
+        ])
+        selector = EpistaticFitness(interaction_matrix=interactions)
+
+        # Both genes high
+        genes = [Gene("g0", 1.0), Gene("g1", 1.0)]
+        individual = Individual(genes)
+
+        # Base = 1.0
+        # Epistasis = (1.0*1.0*0.1 + 1.0*1.0*0.4 + 1.0*1.0*0.4 + 1.0*1.0*0.1) / 2 = 1.0 / 2 = 0.5
+        # Total = 1.0 + 0.5 = 1.5
+        fitness = selector.compute_fitness(individual)
+        assert fitness == pytest.approx(1.5)
+
+    def test_epistatic_fitness_repr(self):
+        """EpistaticFitness has informative repr."""
+        interactions = np.array([[0.5, 0.3], [0.2, -0.1]])
+        selector = EpistaticFitness(interaction_matrix=interactions)
+        repr_str = repr(selector)
+        assert "EpistaticFitness" in repr_str

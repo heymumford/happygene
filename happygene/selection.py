@@ -199,3 +199,108 @@ class AsexualReproduction:
 
     def __repr__(self) -> str:
         return "AsexualReproduction()"
+
+
+class EpistaticFitness(SelectionModel):
+    """Epistatic fitness model: fitness depends on gene-gene interactions.
+
+    Models fitness as: base_fitness + epistatic_bonus
+    where:
+    - base_fitness = mean gene expression
+    - epistatic_bonus = sum of pairwise gene interaction terms
+
+    The interaction matrix defines how expression of gene i modulates
+    fitness effects of gene j. Symmetric interactions model synergy.
+
+    Parameters
+    ----------
+    interaction_matrix : np.ndarray
+        Square matrix of shape (n_genes, n_genes).
+        interaction_matrix[i,j] = interaction strength between genes i and j.
+        Can be positive (synergy), negative (antagonism), or zero (independence).
+
+    Example
+    -------
+    >>> interactions = np.array([
+    ...     [0.1, 0.3],  # g0 auto-interaction 0.1, g0-g1 synergy 0.3
+    ...     [0.3, 0.1],  # g1-g0 synergy 0.3, g1 auto-interaction 0.1
+    ... ])
+    >>> selector = EpistaticFitness(interaction_matrix=interactions)
+    >>> individual = Individual([Gene("g0", 1.0), Gene("g1", 0.8)])
+    >>> fitness = selector.compute_fitness(individual)
+    """
+
+    def __init__(self, interaction_matrix: np.ndarray):
+        """Initialize epistatic fitness model.
+
+        Parameters
+        ----------
+        interaction_matrix : np.ndarray
+            Square matrix of interaction strengths.
+
+        Raises
+        ------
+        ValueError
+            If matrix is not square.
+        """
+        interaction_matrix = np.asarray(interaction_matrix, dtype=float)
+
+        if interaction_matrix.ndim != 2:
+            raise ValueError(f"interaction_matrix must be 2D, got {interaction_matrix.ndim}D")
+
+        n_rows, n_cols = interaction_matrix.shape
+        if n_rows != n_cols:
+            raise ValueError(
+                f"interaction_matrix must be square, got {n_rows}x{n_cols}"
+            )
+
+        self.interaction_matrix = interaction_matrix.copy()
+        self._n_genes = n_rows
+
+    def compute_fitness(self, individual: Individual) -> float:
+        """Compute fitness with epistatic interactions.
+
+        Fitness = base + epistatic_bonus
+        base = mean expression across genes
+        epistatic_bonus = sum of pairwise interaction terms weighted by expression
+
+        Parameters
+        ----------
+        individual : Individual
+            Individual to evaluate.
+
+        Returns
+        -------
+        float
+            Fitness value (can exceed 1.0 if interactions are strongly positive).
+
+        Raises
+        ------
+        ValueError
+            If individual gene count doesn't match interaction matrix size.
+        """
+        expr_vector = np.array([gene.expression_level for gene in individual.genes])
+
+        if len(expr_vector) != self._n_genes:
+            raise ValueError(
+                f"Individual has {len(expr_vector)} genes, "
+                f"but interaction_matrix size is {self._n_genes}x{self._n_genes}"
+            )
+
+        # Base fitness: mean expression
+        base_fitness = np.mean(expr_vector)
+
+        # Epistatic bonus: weighted sum of interaction terms
+        # For each pair (i, j), contribution = expr[i] * expr[j] * interaction[i,j]
+        # This captures how expression of one gene affects fitness through interaction
+        epistatic_bonus = np.sum(expr_vector[:, np.newaxis] * expr_vector[np.newaxis, :]
+                                 * self.interaction_matrix)
+
+        # Normalize epistatic bonus by number of genes (scale down as n_genes increases)
+        if self._n_genes > 1:
+            epistatic_bonus /= self._n_genes
+
+        return base_fitness + epistatic_bonus
+
+    def __repr__(self) -> str:
+        return f"EpistaticFitness({self._n_genes}x{self._n_genes})"
