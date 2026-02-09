@@ -138,3 +138,80 @@ class TestExamples:
 
         # Should show gene expression statistics
         assert "Gene Expression" in result.stdout, "Output missing gene expression stats"
+
+    def test_benchmark_script_runs_basic_scenario(self):
+        """Test that benchmark.py runs with basic scenario parameters.
+
+        Rationale: Verify that the benchmark script executes without errors
+        for a small scenario (100 individuals, 10 genes, 50 generations).
+
+        Success criteria:
+        - Script exits with code 0
+        - Produces benchmark results table
+        - Contains timing information
+        - All expected columns present in output
+        """
+        result = subprocess.run(
+            [sys.executable, "examples/benchmark.py",
+             "--individuals", "100",
+             "--genes", "10",
+             "--generations", "50"],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+
+        # Should exit successfully
+        assert result.returncode == 0, \
+            f"Benchmark script failed with code {result.returncode}\nstderr: {result.stderr}"
+
+        # Should produce output
+        assert len(result.stdout) > 0, "Benchmark script produced no output"
+
+        # Should contain results table header
+        assert "Benchmark Results" in result.stdout, "Output missing benchmark header"
+
+        # Should contain timing information
+        assert "Time (s)" in result.stdout, "Output missing timing column"
+        assert "Ops/sec" in result.stdout, "Output missing ops/sec column"
+
+        # Should contain results
+        assert "100" in result.stdout, "Output should contain individual count"
+        assert "10" in result.stdout, "Output should contain gene count"
+
+    def test_benchmark_script_with_regulation(self):
+        """Test that benchmark.py runs with regulatory network enabled.
+
+        Rationale: Verify that the benchmark script correctly handles the
+        --regulation flag and executes complex scenarios with TF interactions.
+
+        Success criteria:
+        - Script exits with code 0
+        - Produces benchmark results table
+        - Shows timing for regulatory network computation
+        - Contains results for the regulated scenario
+        """
+        result = subprocess.run(
+            [sys.executable, "examples/benchmark.py",
+             "--individuals", "100",
+             "--genes", "20",
+             "--generations", "50",
+             "--regulation"],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+
+        # Should exit successfully
+        assert result.returncode == 0, \
+            f"Benchmark script with regulation failed: {result.stderr}"
+
+        # Should produce output
+        assert len(result.stdout) > 0, "Benchmark script produced no output"
+
+        # Should contain results table
+        assert "Benchmark Results" in result.stdout, "Output missing benchmark header"
+        assert "Time (s)" in result.stdout, "Output missing timing column"
+
+        # Should show the scenario was run (Y indicates regulation=true in table)
+        assert "Y" in result.stdout, "Output should show regulation flag"
