@@ -48,3 +48,4 @@ htmlcov/
 *.h5
 *.hdf5
 .env
+.worktrees/

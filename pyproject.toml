@@ -44,6 +44,7 @@ dependencies = [
     "h5py>=3.9",
     "attrs>=23.1",
     "python-dateutil>=2.8",
+    "plotly>=5.17",
 ]
 
 [project.optional-dependencies]
