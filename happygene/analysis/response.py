@@ -156,8 +156,10 @@ class ResponseSurfaceModel:
         X = batch_results[param_cols].values
         y = batch_results[output_col].values
 
-        # Normalize features
-        X_scaled = self.scaler.fit_transform(X)
+        # Initialize and normalize features
+        from sklearn.preprocessing import StandardScaler
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
 
         # Build feature matrix
         if self.method == "linear":

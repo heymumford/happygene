@@ -146,7 +146,7 @@ class SobolAnalyzer:
         }
 
         # Compute Sobol indices
-        Si = sobol_analyze(
+        Si = sobol_analyze.analyze(
             problem, Y, calc_second_order=calc_second_order, seed=42, conf_level=0.95
         )
 

@@ -198,9 +198,40 @@ def tmp_data_dir(tmp_path):
 def sobol_batch_results(param_names):
     """Batch results sized for Sobol analysis (Saltelli-structured).
 
-    Saltelli (Sobol extended) scheme requires N*(2D+2) rows where D=num_params.
-    For 5 params with N=64: 64*(2*5+2) = 768 rows.
+    Saltelli scheme requires N*(D+2) rows for first-order only analysis.
+    For 5 params with N=64: 64*(5+2) = 448 rows.
     Uses known sensitivity structure for testing.
+    """
+    from SALib.sample import saltelli
+
+    problem = {
+        'num_vars': len(param_names),
+        'names': param_names,
+        'bounds': [(0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.01, 0.99), (0.1, 10.0)],
+    }
+    X = saltelli.sample(problem, 64, calc_second_order=False)
+
+    # Known sensitivity structure for testing
+    np.random.seed(42)
+    Y = (0.5 * X[:, 0] + 0.3 * X[:, 1] + 0.1 * X[:, 2] + 0.05 * X[:, 3] + 0.02 * X[:, 4]
+         + np.random.normal(0, 0.01, len(X)))
+
+    df = pd.DataFrame(X, columns=param_names)
+    df['survival'] = Y
+    df['total_repairs'] = np.random.randint(50, 500, len(X))
+    df['repair_time'] = np.random.uniform(1.0, 100.0, len(X))
+    df['run_id'] = [f'run_{i:05d}' for i in range(len(X))]
+    df['seed'] = [42 + i for i in range(len(X))]
+
+    return df
+
+
+@pytest.fixture
+def sobol_batch_results_second_order(param_names):
+    """Batch results sized for Sobol second-order analysis.
+
+    Saltelli scheme with second-order requires N*(2D+2) rows.
+    For 5 params with N=64: 64*(2*5+2) = 768 rows.
     """
     from SALib.sample import saltelli
 

@@ -149,7 +149,7 @@ class MorrisAnalyzer:
         }
 
         # Compute Morris indices
-        Si = morris_analyze(problem, X, Y, conf_level=0.95, seed=42)
+        Si = morris_analyze.analyze(problem, X, Y, conf_level=0.95, seed=42)
 
         # Extract indices
         indices = MorrisIndices(

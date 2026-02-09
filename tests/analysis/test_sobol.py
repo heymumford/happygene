@@ -109,10 +109,10 @@ class TestSobolAnalyze:
         with pytest.raises(ValueError, match="Expected"):
             analyzer.analyze(sobol_batch_results)
 
-    def test_analyze_with_second_order(self, param_names, sobol_batch_results):
+    def test_analyze_with_second_order(self, param_names, sobol_batch_results_second_order):
         """calc_second_order=True populates S2 matrix."""
         analyzer = SobolAnalyzer(param_names)
-        indices = analyzer.analyze(sobol_batch_results, calc_second_order=True)
+        indices = analyzer.analyze(sobol_batch_results_second_order, calc_second_order=True)
         assert indices.S2 is not None
         assert indices.S2.shape == (len(param_names), len(param_names))
 
@@ -158,20 +158,20 @@ class TestSobolDetectInteractions:
         with pytest.raises(ValueError, match="Second-order"):
             analyzer.detect_interactions(indices)
 
-    def test_detect_returns_list_of_tuples(self, param_names, sobol_batch_results):
+    def test_detect_returns_list_of_tuples(self, param_names, sobol_batch_results_second_order):
         """Returns list of (param1, param2, s2_value) tuples."""
         analyzer = SobolAnalyzer(param_names)
-        indices = analyzer.analyze(sobol_batch_results, calc_second_order=True)
+        indices = analyzer.analyze(sobol_batch_results_second_order, calc_second_order=True)
         interactions = analyzer.detect_interactions(indices, threshold=0.0)
 
         assert isinstance(interactions, list)
         if len(interactions) > 0:
             assert len(interactions[0]) == 3  # (name1, name2, value)
 
-    def test_detect_high_threshold_filters(self, param_names, sobol_batch_results):
+    def test_detect_high_threshold_filters(self, param_names, sobol_batch_results_second_order):
         """High threshold returns fewer interactions."""
         analyzer = SobolAnalyzer(param_names)
-        indices = analyzer.analyze(sobol_batch_results, calc_second_order=True)
+        indices = analyzer.analyze(sobol_batch_results_second_order, calc_second_order=True)
         all_interactions = analyzer.detect_interactions(indices, threshold=0.0)
         few_interactions = analyzer.detect_interactions(indices, threshold=0.5)
 
