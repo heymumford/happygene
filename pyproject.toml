@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "happygene"
-version = "0.1.0-dev"
+version = "0.2.0"
 description = "Interdependent, parameterized simulations modeling DNA repair mechanisms at multi-scale"
 readme = "README.md"
 requires-python = ">=3.12"
