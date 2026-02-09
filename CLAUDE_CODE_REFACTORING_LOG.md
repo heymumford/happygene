@@ -43,6 +43,35 @@
 - Added `kieran-csharp-reviewer` entry (sonnet, tier 1)
 - Added `coverage-enforcement-agent` entry (haiku, tier 0)
 
+### Task 3: Extend Pre-Push Hook for Tier 1 TDD Validation ✅
+
+**Location**: `~/.claude/hooks/pre-push-quality-gate.sh`
+
+**Changes**:
+- Added `validate_tier1_tdd_discipline()` function
+  - Detects if TIER_CLASSIFICATION.md exists (signals tier-based project)
+  - Scans staged changes for modifications to Tier 1 modules
+  - Validates corresponding test files exist for each Tier 1 module changed
+  - Blocks push if Tier 1 module has no test file (blocks bad TDD)
+
+- Tier 1 modules validated (happygene):
+  - happygene/entities.py (tests/test_entities.py)
+  - happygene/base.py (tests/test_base.py)
+  - happygene/model.py (tests/test_model.py)
+  - happygene/datacollector.py (tests/test_datacollector.py)
+  - happygene/conditions.py (tests/test_conditions.py)
+
+- Updated `run_python_make_tests()` for project compatibility
+  - Checks for `make test-quick` target (fast mode)
+  - Falls back to `make test` if not available
+  - Handles projects with different test configurations
+
+**Verification**:
+- Bash syntax validated (bash -n)
+- Tested with staged changes to entities.py (validation passed)
+- Error message format clear and actionable
+- Integration: Phase A Week 3 task ✅
+
 ---
 
 ## Design Decisions
@@ -189,13 +218,13 @@ grep -A 3 "kieran-java\|kieran-csharp" ~/.claude/model_registry.yaml
 | Task | Effort | Phase | Status |
 |------|--------|-------|--------|
 | ✅ Create polyglot agent stubs | 2h | DONE | Complete |
-| ⏳ Extend pre-push hook | 1.5h | A Week 3 | TODO |
-| ⏳ Update model registry | 1h | DONE (partial) | Partial |
+| ✅ Extend pre-push hook | 1.5h | A Week 3 | Complete |
+| ✅ Update model registry | 1h | DONE | Complete |
 | ⏳ Clean debug directory | 0.5h | This week | TODO |
 
 **Total Critical Path**: 5 hours
-**Completed**: 2 hours
-**Remaining**: 3 hours
+**Completed**: 4.5 hours
+**Remaining**: 0.5 hours
 
 ---
 
@@ -266,7 +295,7 @@ This consistency enables uniform quality enforcement across languages.
 
 ---
 
-**Status**: ✅ Tier 1 critical refactoring 40% complete (2 of 5 hours)
-**Next Milestone**: Phase A Week 3 (Pre-push hook TDD validation)
-**Confidence**: HIGH (low-risk, additive changes, polyglot-ready)
+**Status**: ✅ Tier 1 critical refactoring 90% complete (4.5 of 5 hours)
+**Next Milestone**: Debug directory cleanup (0.5h remaining)
+**Confidence**: HIGH (low-risk, additive changes, polyglot-ready, pre-push hook validated)
 
