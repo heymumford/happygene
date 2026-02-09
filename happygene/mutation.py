@@ -1,7 +1,9 @@
 """Mutation models for genetic variation introduction."""
 from abc import ABC, abstractmethod
-from happygene.entities import Individual
+
 import numpy as np
+
+from happygene.entities import Individual
 
 
 class MutationModel(ABC):

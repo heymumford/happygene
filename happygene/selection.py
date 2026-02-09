@@ -1,9 +1,10 @@
 """Selection models for population fitness evaluation and reproduction."""
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
+
 import numpy as np
 
-from happygene.entities import Individual, Gene
+from happygene.entities import Gene, Individual
 
 if TYPE_CHECKING:
     from numpy.random import Generator
@@ -32,6 +33,24 @@ class SelectionModel(ABC):
         """
         ...
 
+    @abstractmethod
+    def compute_fitness_batch(self, expr_matrix: np.ndarray) -> np.ndarray:
+        """Compute fitness for a batch of individuals (vectorized).
+
+        Parameters
+        ----------
+        expr_matrix : np.ndarray
+            Expression matrix of shape (n_individuals, n_genes).
+            Each row is the expression profile of one individual.
+
+        Returns
+        -------
+        np.ndarray
+            Fitness values of shape (n_individuals,).
+            Element i is the fitness of individual i.
+        """
+        ...
+
 
 class ProportionalSelection(SelectionModel):
     """Proportional selection: fitness = mean gene expression.
@@ -54,6 +73,25 @@ class ProportionalSelection(SelectionModel):
             Mean expression level across all genes.
         """
         return individual.mean_expression()
+
+    def compute_fitness_batch(self, expr_matrix: np.ndarray) -> np.ndarray:
+        """Compute fitness for batch via vectorized mean across genes.
+
+        Parameters
+        ----------
+        expr_matrix : np.ndarray
+            Expression matrix of shape (n_individuals, n_genes).
+
+        Returns
+        -------
+        np.ndarray
+            Fitness values of shape (n_individuals,).
+            Element i = mean of row i.
+        """
+        if expr_matrix.shape[1] == 0:
+            # No genes: return zeros
+            return np.zeros(expr_matrix.shape[0])
+        return np.mean(expr_matrix, axis=1)
 
     def __repr__(self) -> str:
         return "ProportionalSelection()"
@@ -89,6 +127,26 @@ class ThresholdSelection(SelectionModel):
         """
         mean_expr = individual.mean_expression()
         return 1.0 if mean_expr >= self.threshold else 0.0
+
+    def compute_fitness_batch(self, expr_matrix: np.ndarray) -> np.ndarray:
+        """Compute fitness for batch via vectorized threshold comparison.
+
+        Parameters
+        ----------
+        expr_matrix : np.ndarray
+            Expression matrix of shape (n_individuals, n_genes).
+
+        Returns
+        -------
+        np.ndarray
+            Fitness values of shape (n_individuals,).
+            Element i = 1.0 if mean(row i) >= threshold, else 0.0.
+        """
+        if expr_matrix.shape[1] == 0:
+            # No genes: all below threshold (return 0.0)
+            return np.zeros(expr_matrix.shape[0])
+        mean_expressions = np.mean(expr_matrix, axis=1)
+        return (mean_expressions >= self.threshold).astype(float)
 
     def __repr__(self) -> str:
         return f"ThresholdSelection(threshold={self.threshold})"
@@ -302,6 +360,39 @@ class EpistaticFitness(SelectionModel):
 
         return base_fitness + epistatic_bonus
 
+    def compute_fitness_batch(self, expr_matrix: np.ndarray) -> np.ndarray:
+        """Compute fitness for batch via vectorized epistatic computation.
+
+        Parameters
+        ----------
+        expr_matrix : np.ndarray
+            Expression matrix of shape (n_individuals, n_genes).
+
+        Returns
+        -------
+        np.ndarray
+            Fitness values of shape (n_individuals,).
+        """
+        if expr_matrix.shape[1] != self._n_genes:
+            raise ValueError(
+                f"Expression matrix has {expr_matrix.shape[1]} genes, "
+                f"but interaction_matrix size is {self._n_genes}x{self._n_genes}"
+            )
+
+        # Base fitness: mean across genes (axis 1) for each individual (axis 0)
+        base_fitness = np.mean(expr_matrix, axis=1)  # shape: (n_individuals,)
+
+        # Epistatic bonus: for each individual, compute pairwise interactions
+        # expr_matrix @ interaction_matrix @ expr_matrix^T gives interaction energy
+        # Diagonal contains individual interaction scores
+        epistatic_bonus = (expr_matrix @ self.interaction_matrix * expr_matrix).sum(axis=1)
+
+        # Normalize by number of genes
+        if self._n_genes > 1:
+            epistatic_bonus /= self._n_genes
+
+        return base_fitness + epistatic_bonus
+
     def __repr__(self) -> str:
         return f"EpistaticFitness({self._n_genes}x{self._n_genes})"
 
@@ -392,6 +483,34 @@ class MultiObjectiveSelection(SelectionModel):
         else:
             # All weights are zero (edge case)
             return 0.0
+
+    def compute_fitness_batch(self, expr_matrix: np.ndarray) -> np.ndarray:
+        """Compute fitness for batch via vectorized weighted aggregate.
+
+        Parameters
+        ----------
+        expr_matrix : np.ndarray
+            Expression matrix of shape (n_individuals, n_genes).
+
+        Returns
+        -------
+        np.ndarray
+            Fitness values of shape (n_individuals,).
+            Element i = weighted aggregate of row i.
+        """
+        if expr_matrix.shape[1] != self._n_objectives:
+            raise ValueError(
+                f"Expression matrix has {expr_matrix.shape[1]} genes, "
+                f"but model expects {self._n_objectives} objectives"
+            )
+
+        # Weighted aggregate: expr_matrix @ weights / sum(weights)
+        if self._sum_weights > 0:
+            weighted_sums = expr_matrix @ self.objective_weights
+            return weighted_sums / self._sum_weights
+        else:
+            # All weights are zero
+            return np.zeros(expr_matrix.shape[0])
 
     def __repr__(self) -> str:
         return f"MultiObjectiveSelection({self._n_objectives} objectives)"

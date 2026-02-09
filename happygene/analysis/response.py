@@ -13,10 +13,11 @@ Supports:
 - Random Forest surrogates
 """
 
+from typing import Dict, List
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Optional, Tuple, List
-from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 
 class ResponseSurfaceModel:
@@ -58,8 +59,8 @@ class ResponseSurfaceModel:
             For method chaining.
         """
         # Import additional sklearn models
-        from sklearn.linear_model import LinearRegression
         from sklearn.ensemble import RandomForestRegressor
+        from sklearn.linear_model import LinearRegression
 
         # Re-initialize scaler for fresh state
         self.scaler = StandardScaler()
@@ -148,9 +149,9 @@ class ResponseSurfaceModel:
         dict
             Metrics: 'r2', 'rmse', 'mae' (mean absolute error)
         """
-        from sklearn.metrics import mean_absolute_error, mean_squared_error
-        from sklearn.linear_model import LinearRegression
         from sklearn.ensemble import RandomForestRegressor
+        from sklearn.linear_model import LinearRegression
+        from sklearn.metrics import mean_absolute_error, mean_squared_error
 
         param_cols = [p for p in self.param_names if p in batch_results.columns]
         X = batch_results[param_cols].values

@@ -13,8 +13,9 @@ Design rationale (ADR-005):
 - Immutable: Both models are stored as properties (no post-init modification)
 """
 from abc import ABC, abstractmethod
-from happygene.expression import ExpressionModel
+
 from happygene.conditions import Conditions
+from happygene.expression import ExpressionModel
 
 
 class RegulatoryExpressionModel(ABC):

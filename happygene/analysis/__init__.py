@@ -33,8 +33,8 @@ Modules
 """
 
 from .batch import BatchSimulator
-from .sobol import SobolAnalyzer, SobolIndices
 from .morris import MorrisAnalyzer, MorrisIndices
+from .sobol import SobolAnalyzer, SobolIndices
 
 __all__ = [
     "BatchSimulator",

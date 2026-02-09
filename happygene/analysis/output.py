@@ -12,9 +12,10 @@ All plots are publication-ready with professional styling.
 """
 
 import json
-import pandas as pd
-from typing import Dict, Optional, Tuple, List
 from pathlib import Path
+from typing import Dict
+
+import pandas as pd
 
 
 class OutputExporter:

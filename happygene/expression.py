@@ -1,5 +1,6 @@
 """Expression models for gene regulation."""
 from abc import ABC, abstractmethod
+
 from happygene.conditions import Conditions
 
 

@@ -5,9 +5,10 @@ at initialization time. Disabled by default for performance.
 """
 from dataclasses import dataclass
 from typing import List, Optional, Set, Tuple
+
+import networkx as nx
 import numpy as np
 import scipy.sparse
-import networkx as nx
 
 
 @dataclass

@@ -12,10 +12,11 @@ Produces:
 - Parameter classification: Important, Interaction, Insignificant
 """
 
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Tuple, Optional, List
-from dataclasses import dataclass
 
 try:
     from SALib.analyze import morris as morris_analyze
