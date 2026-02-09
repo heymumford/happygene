@@ -16,6 +16,7 @@
 | [004](ADR-004-git-and-provenance.md) | Git + Provenance Metadata | DECIDED | 2026-02-08 | engine/io/ |
 | [005](ADR-005-release-and-changelog.md) | SemVer Release + Changelog | DECIDED | 2026-02-08 | Release pipeline |
 | [006](ADR-006-macos-swiftui.md) | macOS UI (SwiftUI, Phase 2) | PROPOSED | 2026-02-08 | macos/ |
+| [007](ADR-007-cloud-local-orchestration.md) | Cloud-Local Orchestration (Azure Batch) | DECIDED | 2026-02-09 | engine/orchestration/ |
 
 ---
 
