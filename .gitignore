@@ -52,3 +52,5 @@ htmlcov/
 
 # Documentation
 site/
+docs/build/
+docs/source/generated/
