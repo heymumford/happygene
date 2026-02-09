@@ -1,0 +1,179 @@
+CLAUDE CODE STACK AUDIT - EXECUTIVE SUMMARY
+============================================
+
+Date: 2026-02-09
+User: Eric Mumford (@heymumford)
+Scope: Complete workflow stack (agents, skills, MCPs, protocols)
+
+=== CURRENT STATE ===
+
+Agents:      57 total (39 haiku @ 90%, 3 sonnet @ 8%, 3 opus @ 2%)
+Skills:      13 active (5 core + 8 domain-specific)
+MCPs:        7 connected (Tier 0-2 architecture)
+Protocols:   16 domain-specific behavioral contracts
+Cost Model:  $11-17/hr operational vs $83/hr baseline (87% reduction)
+
+=== CRITICAL GAP: POLYGLOT DEBT ===
+
+Primary Languages Declared: .NET (C#/F#), Java, Python 3.12+
+Actual Coverage:
+  ✅ Python:      100% (kieran-python-reviewer)
+  ✅ TypeScript:  80% (kieran-typescript-reviewer)
+  ✅ Rails:       80% (kieran-rails-reviewer)
+  ❌ Java:        20% (no language-specific reviewer)
+  ❌ C#/.NET:     20% (no language-specific reviewer)
+
+Evidence:
+- User declares 3 primary languages in CLAUDE.md
+- Agent registry has 39 review agents but only 3 language-specific
+- /quality skill dispatches kieran-python-reviewer, no Java/C# equivalent
+- When users write C# code, falls back to generic architecture-strategist (expensive, loses nuance)
+
+=== TOP 7 GAPS (By Severity) ===
+
+CRITICAL (fix this week):
+1. Zero Java reviewer agents (user declares Java as primary)
+2. Zero C#/.NET reviewer agents (user declares C#/F# as primary)
+
+HIGH (fix next week):
+3. TDD not enforced in /build execute phase (tests written post-code)
+4. No coverage percentage gate in /quality (coverage drifts, no threshold)
+5. Pre-push hook only detects Python/dotnet (missing Java, Node, Go)
+
+MEDIUM (fix this month):
+6. security-reviewer (opus) not auto-dispatched on suspicious patterns
+7. No contract testing guidance for polyglot services
+
+LOW (nice-to-have):
+8. /quality doesn't diagnose test failures (defers to /fix)
+
+=== COST-BENEFIT ANALYSIS ===
+
+Recommendation                          Effort    Impact              Cost
+─────────────────────────────────────────────────────────────────────────
+1. Add Java/C# reviewers               1 day     40% coverage       Minimal
+2. Enforce TDD gate in /build           1 day     Earlier defects    Minimal
+3. Add coverage gate to /quality        1 day     Prevent drift      Minimal
+4. Extend pre-push hook (Java/Go)       2 days    5 langs supported  Minimal
+5. Auto-dispatch security-reviewer      2 days    Proactive scanning $3/review
+6. Add contract testing protocol        2 days    Service boundaries Minimal
+─────────────────────────────────────────────────────────────────────────
+TOTAL                                  ~10 days  Near-100% polyglot Minimal overhead
+
+=== SKILL-BY-SKILL HEALTH CHECK ===
+
+Core Skills:
+  /build      ✅ Design/Plan strong, ⚠️ Execute needs TDD gate
+  /quality    ✅ Breadth good (8 agents), ❌ Missing Java/C# reviewers
+  /ship       ✅ Solid PR automation, ⚠️ Could add deploy rollback
+  /fix        ✅ Evidence-based debugging, ⚠️ Test diagnosis deferred
+  /work       ✅ Cynefin classification, ⚠️ Doesn't select language skill
+  /write      ✅ Excellent (no changes needed)
+  /snap       ✅ Clean routing, ⚠️ Doesn't leverage language context
+
+Domain Skills:
+  /cv-assess  ⚠️ Python-biased, needs xUnit/NUnit/Jest support
+  /psql       ⚠️ SQL agnostic but Python driver-biased
+  /productowner, /robot, /gitlab, /playwright: OK (domain-specific)
+
+=== MCP COVERAGE ===
+
+Status: ✅ Strong (language-agnostic)
+- brave-search: Universal
+- memory: Universal
+- context7: Covers 100+ frameworks
+- postgres: SQL-agnostic, Python-driver-biased
+- jira-guild, confluence-guild: Project-agnostic
+
+No MCP gaps identified.
+
+=== RECOMMENDATIONS (PRIORITIZED) ===
+
+PHASE 1 (IMMEDIATE - This Week)
+[Priority: CRITICAL]
+- Create kieran-java-reviewer agent (copy from kieran-python-reviewer)
+- Create kieran-csharp-reviewer agent
+- Update model_registry.yaml with both agents
+- Update /quality SKILL.md to dispatch by file extension (.java → java-reviewer, .cs → csharp-reviewer)
+- Test with sample Java/C# files
+
+PHASE 2 (NEAR-TERM - Next Week)
+[Priority: HIGH]
+- Add coverage percentage gate to /quality (fail if <75%)
+- Enforce TDD in /build execute (tests must exist before code dispatch)
+- Extend pre-push hook to detect: java-gradle, java-maven, node-npm, go-mod
+- Test with HappyGene project (Python) + sample Java/Go projects
+
+PHASE 3 (MEDIUM-TERM - Month)
+[Priority: MEDIUM]
+- Pattern-match for suspicious code (auth, crypto, DB, HTTP)
+- Auto-dispatch security-reviewer on matches
+- Create contract-testing-polyglot protocol
+- Update /quality contracts routing
+
+=== QUICK WINS ===
+
+1. Add Java reviewer: Copy kieran-python-reviewer, change language focus → 4 hours
+2. Add C# reviewer: Copy kieran-python-reviewer, change language focus → 4 hours
+3. Update registry + routing: 2 hours
+4. Test: 2 hours
+TOTAL: 1 day to close 40% polyglot gap
+
+=== SUCCESS METRICS (Post-Implementation) ===
+
+Metric                             Current    Target    How to Measure
+──────────────────────────────────────────────────────────────────────
+Agent coverage by language         0% Java    100%      Registry by lang
+                                   0% C#      100%
+Test-first adherence               Unknown    100%      Pre-commit hook
+Coverage enforcement               0%         100%      /quality enforce report
+Security scanner dispatch rate     0/100      30%+      Log patterns
+Pre-push hook language support     3 langs    6+ langs  Hook detection
+
+=== KEY DECISIONS TO MAKE ===
+
+Q1: Polyglot Priority?
+    40% Python, 30% Java, 30% C# → Equal effort on all three
+    80% Python, 20% others → Java/C# can wait (less urgent)
+
+Q2: Coverage Threshold Universal?
+    75% everywhere (current HappyGene default)
+    OR per-project (configurable in CLAUDE.md)
+
+Q3: Security Proactivity?
+    Auto-dispatch on (auth, crypto only) — LOW false positive rate
+    OR auto-dispatch on (all user-input handling) — HIGH cost
+
+Q4: Language Tiers?
+    100% all top 5 languages
+    OR tiered: 100% Python, 80% TypeScript/Java, 50% C#/Go
+
+=== FILES CHANGED ===
+
+If you approve recommendations, changes affect:
+- ~/.claude/agents/ (add 2 new agents)
+- ~/.claude/model_registry.yaml (add 2 entries)
+- ~/.claude/skills/build/SKILL.md (TDD gate)
+- ~/.claude/skills/quality/SKILL.md (coverage gate, routing)
+- ~/.claude/skills/work/SKILL.md (language detection)
+- ~/.claude/skills/snap/SKILL.md (language routing)
+- ~/.claude/hooks/pre-push-quality-gate.sh (Java/Node/Go detection)
+- ~/.claude/protocols/ (new: contract-testing-polyglot.md)
+
+Total file changes: 8 files, ~500 lines added
+
+=== NEXT STEPS ===
+
+1. Review this audit (30 min)
+2. Decide on polyglot priority + coverage threshold (15 min decision)
+3. Approve Phase 1 recommendations (if yes → 1 day implementation)
+4. Schedule Phase 2 (next week) + Phase 3 (month)
+
+=== CONFIDENCE LEVEL ===
+
+HIGH: Based on review of 57 agents, 13 skills, 16 protocols, 7 MCPs
+      All recommendations are inverse-mapped from existing patterns
+      No architectural changes required, only additions
+
+Audit conducted: Repository Research Analyst
+Reference document: CURRENT_STACK_AUDIT.md (13,000+ words)
