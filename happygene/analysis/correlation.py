@@ -14,11 +14,11 @@ Produces:
 Example
 -------
 >>> from happygene.analysis.correlation import CorrelationAnalyzer
->>> from tests.analysis.conftest import batch_results_df  # See fixtures
 >>> import numpy as np
 >>> import pandas as pd
 >>>
 >>> # Create sample batch results
+>>> np.random.seed(42)
 >>> params = ['p0', 'p1', 'p2', 'p3', 'p4']
 >>> X = np.random.rand(100, 5)
 >>> y = 0.5*X[:,0] + 0.3*X[:,1] + 0.1*np.random.rand(100)

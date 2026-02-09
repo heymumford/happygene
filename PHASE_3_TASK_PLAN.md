@@ -94,7 +94,7 @@ Complete Phase 3 (BLUE) with comprehensive documentation, production examples, a
 - **Tool calls:** 45 (read/write/bash/edit operations)
 - **Redundant calls:** 0
 - **Backtracking:** 3 (SALib API calls, fixture size validation, scaler initialization)
-- **Efficiency:** 88% (3 iterations on 14 tasks = 86% efficiency, acceptable for bug discovery)
+- **Efficiency:** 86% (3 iterations on 14 tasks, acceptable for bug discovery)
 
 ## Final Deliverables
 
